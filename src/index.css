@@ -1,0 +1,23 @@
+/* Global reset — component styles are injected by GlobalStyles in UrbanBricks.jsx */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #0D0604;
+  color: #F2E5CC;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #B85C38;
+}
