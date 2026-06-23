@@ -1,58 +1,59 @@
 // src/UrbanBricks.jsx  –  Full redesign: 3D building, day/night sky, light/dark theme, 3D tilt cards
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import founderImg from "./assets/chandan.jpg";
 import {
   Home, Building2, Tractor, MapPin, Trees, Store, Factory,
   LayoutTemplate, Layers, Palette, Sofa, Phone, Mail,
   Globe, MapPinned, Menu, X, ChevronRight, ArrowUpRight,
-  Sun, Moon, Tag, Key, Award, Utensils, Film,
+  Sun, Moon, Tag, Key, Award, HardHat,
 } from "lucide-react";
 
 // ══════════════════════════════════════════════════════════════
 //  THEME TOKENS
 // ══════════════════════════════════════════════════════════════
 const DARK = {
-  bg:         "#080403", // Premium mahogany black
-  bgAlt:      "#130906", // Dark clay warm background
-  card:       "rgba(26, 14, 10, 0.85)", // Glassmorphic amber-cocoa card
-  border:     "rgba(184, 92, 56, 0.22)", // Rich terracotta outline
-  text1:      "#F6ECD9", // Warm parchment white
-  text2:      "#C5B09E", // Soft bronze-grey
-  terra:      "#C95B32", // Vibrant sunset terracotta
-  terraDark:  "#8C2D11", // Deep warm brick red
+  bg: "#080403", // Premium mahogany black
+  bgAlt: "#130906", // Dark clay warm background
+  card: "rgba(26, 14, 10, 0.85)", // Glassmorphic amber-cocoa card
+  border: "rgba(184, 92, 56, 0.22)", // Rich terracotta outline
+  text1: "#F6ECD9", // Warm parchment white
+  text2: "#C5B09E", // Soft bronze-grey
+  terra: "#C95B32", // Vibrant sunset terracotta
+  terraDark: "#8C2D11", // Deep warm brick red
   terraLight: "#FF7E5F", // Glowing coral accent
-  gold:       "#D49D42", // Refined honey gold
-  goldLight:  "#FED049", // Vivid radiant saffron
-  shadow:     "rgba(0,0,0,0.75)",
-  glass:      "rgba(13,6,4,0.92)",
-  skyA:       "#020714",
-  skyB:       "#0C1428",
-  skyC:       "#180C05",
-  isDark:     true,
+  gold: "#D49D42", // Refined honey gold
+  goldLight: "#FED049", // Vivid radiant saffron
+  shadow: "rgba(0,0,0,0.75)",
+  glass: "rgba(13,6,4,0.92)",
+  skyA: "#020714",
+  skyB: "#0C1428",
+  skyC: "#180C05",
+  isDark: true,
 };
 
 const LIGHT = {
-  bg:         "#FDFBF7", // Luxurious warm pearl sand
-  bgAlt:      "#F7EFE2", // Warm sand clay
-  card:       "rgba(255, 255, 255, 0.88)", // Warm white glass
-  border:     "rgba(198, 90, 49, 0.16)", // Warm terracotta outline
-  text1:      "#281102", // Deep mahogany espresso
-  text2:      "#745239", // Refined cocoa brown
-  terra:      "#C65A31", // Sunset terracotta accent
-  terraDark:  "#9C3511", // Deep clay red
+  bg: "#FDFBF7", // Luxurious warm pearl sand
+  bgAlt: "#F7EFE2", // Warm sand clay
+  card: "rgba(255, 255, 255, 0.88)", // Warm white glass
+  border: "rgba(198, 90, 49, 0.16)", // Warm terracotta outline
+  text1: "#281102", // Deep mahogany espresso
+  text2: "#745239", // Refined cocoa brown
+  terra: "#C65A31", // Sunset terracotta accent
+  terraDark: "#9C3511", // Deep clay red
   terraLight: "#F07A54", // Saffron sunset orange
-  gold:       "#CCA05A", // Radiant warm gold
-  goldLight:  "#F4D08B", // Saffron gold highlight
-  shadow:     "rgba(139, 69, 19, 0.08)",
-  glass:      "rgba(253, 251, 247, 0.93)",
-  skyA:       "#FF7E5F", // Sunset coral
-  skyB:       "#FEB47B", // Sunset peach
-  skyC:       "#FFE5B4", // Sunset saffron
-  isDark:     false,
+  gold: "#CCA05A", // Radiant warm gold
+  goldLight: "#F4D08B", // Saffron gold highlight
+  shadow: "rgba(139, 69, 19, 0.08)",
+  glass: "rgba(253, 251, 247, 0.93)",
+  skyA: "#FF7E5F", // Sunset coral
+  skyB: "#FEB47B", // Sunset peach
+  skyC: "#FFE5B4", // Sunset saffron
+  isDark: false,
 };
 
 const spring = { type: "spring", stiffness: 360, damping: 28 };
-const ease   = { duration: 0.65, ease: [0.22, 1, 0.36, 1] };
+const ease = { duration: 0.65, ease: [0.22, 1, 0.36, 1] };
 
 // ══════════════════════════════════════════════════════════════
 //  FONT LOADER
@@ -61,7 +62,7 @@ function useFonts() {
   useEffect(() => {
     const el = document.createElement("link");
     el.href = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap";
-    el.rel  = "stylesheet";
+    el.rel = "stylesheet";
     document.head.appendChild(el);
     return () => el.parentNode?.removeChild(el);
   }, []);
@@ -139,6 +140,31 @@ function GlobalStyles({ t }) {
 
       .ub-hide-mobile { display: flex; }
       .ub-show-mobile { display: none; }
+      
+      /* Infinite Marquee Animation */
+      .marquee-container {
+        overflow: hidden;
+        width: 100%;
+        display: flex;
+        position: relative;
+        mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        padding: 10px 0;
+      }
+      .marquee-track {
+        display: flex;
+        width: max-content;
+        gap: 16px;
+        animation: marqueeScroll 40s linear infinite;
+      }
+      @keyframes marqueeScroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .marquee-track:hover {
+        animation-play-state: paused;
+      }
+      
       @media (max-width: 768px) {
         .ub-hide-mobile { display: none !important; }
         .ub-show-mobile { display: flex !important; }
@@ -207,8 +233,8 @@ function ThemeToggle({ isDark, onToggle, t }) {
     >
       <AnimatePresence mode="wait">
         {isDark
-          ? <motion.span key="sun"   initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}  transition={{ duration: 0.2 }}><Sun  size={16} /></motion.span>
-          : <motion.span key="moon" initial={{ rotate:  90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}><Moon size={16} /></motion.span>
+          ? <motion.span key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}><Sun size={16} /></motion.span>
+          : <motion.span key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}><Moon size={16} /></motion.span>
         }
       </AnimatePresence>
     </motion.button>
@@ -275,7 +301,7 @@ function NightSky({ stars }) {
       }}
     >
       <div style={{ position: "absolute", right: "22%", top: "18%", width: 10, height: 10, borderRadius: "50%", background: "rgba(175,158,70,0.38)" }} />
-      <div style={{ position: "absolute", left: "28%", bottom: "26%", width: 7,  height: 7,  borderRadius: "50%", background: "rgba(175,158,70,0.28)" }} />
+      <div style={{ position: "absolute", left: "28%", bottom: "26%", width: 7, height: 7, borderRadius: "50%", background: "rgba(175,158,70,0.28)" }} />
     </motion.div>
   </>;
 }
@@ -306,7 +332,7 @@ function DaySky() {
       }}
     />
     {/* Sun rays */}
-    {[0,45,90,135,180,225,270,315].map((deg, i) => (
+    {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
       <motion.div key={i}
         animate={{ opacity: [0.25, 0.6, 0.25] }}
         transition={{ delay: i * 0.18, duration: 3, repeat: Infinity }}
@@ -321,7 +347,7 @@ function DaySky() {
     ))}
     {/* Clouds */}
     <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6, duration: 1 }}>
-      <Cloud left="6%"  top="22%" scale={1.4} />
+      <Cloud left="6%" top="22%" scale={1.4} />
     </motion.div>
     <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9, duration: 1 }}>
       <Cloud left="38%" top="14%" scale={0.85} />
@@ -334,24 +360,24 @@ function DaySky() {
 
 function CitySilhouette({ t }) {
   const col = t.isDark ? "#040A18" : "rgba(155,80,30,0.32)";
-  
+
   const buildings = useMemo(() => [
-    { x: 34,  y: 28, w: 28,  h: 62 },
-    { x: 59,  y: 38, w: 32,  h: 52 },
-    { x: 128, y: 22, w: 36,  h: 68 },
-    { x: 176, y: 32, w: 30,  h: 58 },
-    { x: 202, y: 10, w: 40,  h: 80 },
-    { x: 284, y: 26, w: 34,  h: 64 },
-    { x: 334, y: 36, w: 30,  h: 54 },
-    { x: 360, y: 12, w: 44,  h: 78 },
-    { x: 416, y: 30, w: 36,  h: 60 },
-    { x: 470, y: 22, w: 32,  h: 68 },
-    { x: 516, y: 24, w: 42,  h: 66 },
-    { x: 574, y: 38, w: 30,  h: 52 },
-    { x: 600, y: 10, w: 36,  h: 80 },
-    { x: 650, y: 30, w: 32,  h: 60 },
-    { x: 702, y: 22, w: 40,  h: 68 },
-    { x: 758, y: 28, w: 42,  h: 62 },
+    { x: 34, y: 28, w: 28, h: 62 },
+    { x: 59, y: 38, w: 32, h: 52 },
+    { x: 128, y: 22, w: 36, h: 68 },
+    { x: 176, y: 32, w: 30, h: 58 },
+    { x: 202, y: 10, w: 40, h: 80 },
+    { x: 284, y: 26, w: 34, h: 64 },
+    { x: 334, y: 36, w: 30, h: 54 },
+    { x: 360, y: 12, w: 44, h: 78 },
+    { x: 416, y: 30, w: 36, h: 60 },
+    { x: 470, y: 22, w: 32, h: 68 },
+    { x: 516, y: 24, w: 42, h: 66 },
+    { x: 574, y: 38, w: 30, h: 52 },
+    { x: 600, y: 10, w: 36, h: 80 },
+    { x: 650, y: 30, w: 32, h: 60 },
+    { x: 702, y: 22, w: 40, h: 68 },
+    { x: 758, y: 28, w: 42, h: 62 },
   ], []);
 
   const windows = useMemo(() => {
@@ -385,38 +411,38 @@ function CitySilhouette({ t }) {
     <svg viewBox="0 0 800 90" preserveAspectRatio="none"
       style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: 90 }}
     >
-      <rect x="0"   y="55" width="38"  height="35" fill={col} />
-      <rect x="34"  y="28" width="28"  height="62" fill={col} />
-      <rect x="57"  y="15" width="5"   height="75" fill={col} />
-      <rect x="59"  y="38" width="32"  height="52" fill={col} />
-      <rect x="87"  y="60" width="26"  height="30" fill={col} />
-      <rect x="110" y="42" width="22"  height="48" fill={col} />
-      <rect x="128" y="22" width="36"  height="68" fill={col} />
-      <rect x="160" y="50" width="20"  height="40" fill={col} />
-      <rect x="176" y="32" width="30"  height="58" fill={col} />
-      <rect x="202" y="10" width="40"  height="80" fill={col} />
-      <rect x="238" y="45" width="22"  height="45" fill={col} />
-      <rect x="256" y="58" width="32"  height="32" fill={col} />
-      <rect x="284" y="26" width="34"  height="64" fill={col} />
-      <rect x="314" y="48" width="24"  height="42" fill={col} />
-      <rect x="334" y="36" width="30"  height="54" fill={col} />
-      <rect x="360" y="12" width="44"  height="78" fill={col} />
-      <rect x="400" y="52" width="20"  height="38" fill={col} />
-      <rect x="416" y="30" width="36"  height="60" fill={col} />
-      <rect x="448" y="58" width="26"  height="32" fill={col} />
-      <rect x="470" y="22" width="32"  height="68" fill={col} />
-      <rect x="498" y="44" width="22"  height="46" fill={col} />
-      <rect x="516" y="24" width="42"  height="66" fill={col} />
-      <rect x="554" y="54" width="24"  height="36" fill={col} />
-      <rect x="574" y="38" width="30"  height="52" fill={col} />
-      <rect x="600" y="10" width="36"  height="80" fill={col} />
-      <rect x="632" y="48" width="22"  height="42" fill={col} />
-      <rect x="650" y="30" width="32"  height="60" fill={col} />
-      <rect x="678" y="58" width="28"  height="32" fill={col} />
-      <rect x="702" y="22" width="40"  height="68" fill={col} />
-      <rect x="738" y="44" width="24"  height="46" fill={col} />
-      <rect x="758" y="28" width="42"  height="62" fill={col} />
-      
+      <rect x="0" y="55" width="38" height="35" fill={col} />
+      <rect x="34" y="28" width="28" height="62" fill={col} />
+      <rect x="57" y="15" width="5" height="75" fill={col} />
+      <rect x="59" y="38" width="32" height="52" fill={col} />
+      <rect x="87" y="60" width="26" height="30" fill={col} />
+      <rect x="110" y="42" width="22" height="48" fill={col} />
+      <rect x="128" y="22" width="36" height="68" fill={col} />
+      <rect x="160" y="50" width="20" height="40" fill={col} />
+      <rect x="176" y="32" width="30" height="58" fill={col} />
+      <rect x="202" y="10" width="40" height="80" fill={col} />
+      <rect x="238" y="45" width="22" height="45" fill={col} />
+      <rect x="256" y="58" width="32" height="32" fill={col} />
+      <rect x="284" y="26" width="34" height="64" fill={col} />
+      <rect x="314" y="48" width="24" height="42" fill={col} />
+      <rect x="334" y="36" width="30" height="54" fill={col} />
+      <rect x="360" y="12" width="44" height="78" fill={col} />
+      <rect x="400" y="52" width="20" height="38" fill={col} />
+      <rect x="416" y="30" width="36" height="60" fill={col} />
+      <rect x="448" y="58" width="26" height="32" fill={col} />
+      <rect x="470" y="22" width="32" height="68" fill={col} />
+      <rect x="498" y="44" width="22" height="46" fill={col} />
+      <rect x="516" y="24" width="42" height="66" fill={col} />
+      <rect x="554" y="54" width="24" height="36" fill={col} />
+      <rect x="574" y="38" width="30" height="52" fill={col} />
+      <rect x="600" y="10" width="36" height="80" fill={col} />
+      <rect x="632" y="48" width="22" height="42" fill={col} />
+      <rect x="650" y="30" width="32" height="60" fill={col} />
+      <rect x="678" y="58" width="28" height="32" fill={col} />
+      <rect x="702" y="22" width="40" height="68" fill={col} />
+      <rect x="738" y="44" width="24" height="46" fill={col} />
+      <rect x="758" y="28" width="42" height="62" fill={col} />
+
       {/* Dynamic Flickering Windows */}
       {windows.map((w) => (
         <motion.rect
@@ -443,6 +469,307 @@ function CitySilhouette({ t }) {
 // ══════════════════════════════════════════════════════════════
 //  3D CSS BUILDING (shared between preloader + hero)
 // ══════════════════════════════════════════════════════════════
+function FancyVilla3D({ t }) {
+  const dropSpring = { type: "spring", stiffness: 100, damping: 15 };
+  const popSpring = { type: "spring", stiffness: 140, damping: 12 };
+
+  return (
+    <div style={{ transform: "perspective(1200px) rotateX(15deg)", transformStyle: "preserve-3d" }}>
+      <motion.div
+        animate={{ rotateY: [-28, -20, -28] }}
+        transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
+        style={{ transformStyle: "preserve-3d", width: "200px", height: "200px", position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}
+      >
+        {/* 1. LAWN / MAIN BASE BLOCK (Raised 3D Slab) */}
+        <motion.div
+          initial={{ transform: "translate3d(0px, 120px, 0px) rotateX(90deg) scale(0)", opacity: 0 }}
+          animate={{ transform: "translate3d(0px, 60px, 0px) rotateX(90deg) scale(1)", opacity: 1 }}
+          transition={{ ...dropSpring, delay: 0.1 }}
+          style={{
+            position: "absolute",
+            width: "200px", height: "160px",
+            background: "linear-gradient(135deg, #2E7D32, #4CAF50)", // Premium rich grass lawn
+            border: `1.5px solid ${t.border}`,
+            boxShadow: `0 25px 60px ${t.shadow}`,
+            transformStyle: "preserve-3d"
+          }}
+        >
+          {/* Paver Path & Driveway (Right side) */}
+          <div style={{
+            position: "absolute", right: "12px", top: 0, width: "38px", height: "160px",
+            background: "repeating-linear-gradient(0deg, #9E9E9E 0px, #9E9E9E 8px, #757575 8px, #757575 10px)",
+            boxShadow: "inset 4px 0 10px rgba(0,0,0,0.15)"
+          }} />
+
+          {/* Stepping stones from driveway to house */}
+          {[{ y: 40 }, { y: 60 }, { y: 80 }].map((stone, idx) => (
+            <div key={idx} style={{
+              position: "absolute", left: "115px", top: `${stone.y}px`, width: "16px", height: "10px",
+              background: "#E2E8F0", border: "1px solid #CBD5E1", borderRadius: "3px", transform: "translateZ(1px)"
+            }} />
+          ))}
+
+          {/* 3D Base Slab side thickness walls */}
+          <div style={{ position: "absolute", left: 0, top: "160px", width: "200px", height: "16px", background: "linear-gradient(to bottom, #2E1C0C, #120905)", transform: "rotateX(-90deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", left: 0, top: 0, width: "200px", height: "16px", background: "linear-gradient(to bottom, #3E2723, #180C07)", transform: "rotateX(90deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", left: 0, top: 0, width: "16px", height: "160px", background: "linear-gradient(to bottom, #2E1C0C, #120905)", transform: "rotateY(-90deg)", transformOrigin: "left center" }} />
+          <div style={{ position: "absolute", left: "200px", top: 0, width: "16px", height: "160px", background: "linear-gradient(to bottom, #3E2723, #180C07)", transform: "rotateY(90deg)", transformOrigin: "left center" }} />
+
+          {/* ── INTERNAL VILLA SCENE ELEMENTS (nested inside rotated base plate) ── */}
+
+          {/* A. SWIMMING POOL DECK (Raised 8px with deep water inset) */}
+          <div style={{
+            position: "absolute", left: "10px", top: "95px", width: "75px", height: "50px",
+            background: "#E2E8F0", border: "1px solid #94A3B8", borderRadius: "4px",
+            transformStyle: "preserve-3d", transform: "translateZ(8px)",
+            boxShadow: "0 6px 12px rgba(0,0,0,0.15)"
+          }}>
+            {/* Water Surface (Sunk inside deck) */}
+            <div className="pool-water" style={{
+              position: "absolute", inset: "3px",
+              background: "linear-gradient(135deg, #00E5FF 0%, #00838F 100%)",
+              transform: "translateZ(-6px)",
+              boxShadow: "inset 0 0 12px rgba(0,0,0,0.45)"
+            }} />
+            {/* Chrome Pool Ladder */}
+            <div style={{
+              position: "absolute", right: "8px", top: "2px", width: "8px", height: "12px",
+              border: "1.5px solid #CFD8DC", borderBottom: "none", borderRadius: "4px 4px 0 0",
+              transform: "rotateX(-90deg) translateZ(4px)", transformOrigin: "bottom center"
+            }} />
+            {/* Glass Perimeter Fence */}
+            <div style={{
+              position: "absolute", inset: 0,
+              border: "1.5px solid rgba(0, 229, 255, 0.35)",
+              background: "rgba(0, 229, 255, 0.06)",
+              borderRadius: "4px",
+              transform: "translateZ(12px)",
+              pointerEvents: "none"
+            }} />
+          </div>
+
+          {/* B. WOODEN LOUNGE DECK & PARASOL */}
+          <div style={{
+            position: "absolute", left: "10px", top: "25px", width: "35px", height: "60px",
+            background: "#A1887F", border: "1px solid #8D6E63", borderRadius: "2px",
+            transformStyle: "preserve-3d", transform: "translateZ(2px)",
+            backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,0,0,0.08) 4px, rgba(0,0,0,0.08) 5px)"
+          }}>
+            {/* 3D Beach Parasol (Umbrella) */}
+            <div style={{
+              position: "absolute", left: "15px", top: "25px", width: "2px", height: "35px",
+              background: "#CFD8DC",
+              transformStyle: "preserve-3d",
+              transform: "rotateX(-90deg) translateZ(0px)",
+              transformOrigin: "bottom center"
+            }}>
+              {/* Umbrella Cone Canopy */}
+              <div style={{
+                position: "absolute", top: "-10px", left: "-14px", width: "30px", height: "10px",
+                background: "conic-gradient(#FF5252 0% 12.5%, #FFF 12.5% 25%, #FF5252 25% 37.5%, #FFF 37.5% 50%, #FF5252 50% 62.5%, #FFF 62.5% 75%, #FF5252 75% 87.5%, #FFF 87.5% 100%)",
+                borderRadius: "50%",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+                transform: "rotateX(20deg)" // slightly tilted parasol
+              }} />
+            </div>
+          </div>
+
+          {/* C. 3D ENTRANCE CONCRETE STEPS */}
+          {[
+            { w: 26, h: 14, t: 80, z: 2 },
+            { w: 22, h: 10, t: 82, z: 4 },
+            { w: 18, h: 6, t: 84, z: 6 }
+          ].map((step, idx) => (
+            <div key={idx} style={{
+              position: "absolute", left: "95px", top: `${step.t}px`, width: `${step.w}px`, height: `${step.h}px`,
+              background: "#94A3B8", border: "1px solid #64748B", borderRadius: "1px",
+              transform: `translateZ(${step.z}px)`
+            }} />
+          ))}
+
+          {/* D. LUXURY BUNGALOW VILLA - GROUND FLOOR */}
+          {/* Back Wall */}
+          <div style={{
+            position: "absolute", left: "55px", top: "20px", width: "85px", height: "55px",
+            background: "linear-gradient(to top, #3E2723, #4E342E)",
+            border: `1.5px solid ${t.border}`,
+            transform: "rotateX(-90deg)", transformOrigin: "bottom center"
+          }} />
+          {/* Left Wall */}
+          <div style={{
+            position: "absolute", left: "55px", top: "20px", width: "60px", height: "55px",
+            background: "linear-gradient(to top, #3E2723, #4E342E)",
+            border: `1.5px solid ${t.border}`,
+            transform: "rotateY(90deg) rotateX(-90deg)", transformOrigin: "bottom left"
+          }} />
+          {/* Right Wall */}
+          <div style={{
+            position: "absolute", left: "140px", top: "20px", width: "60px", height: "55px",
+            background: "linear-gradient(to top, #2E1C0C, #3E2723)",
+            border: `1.5px solid ${t.border}`,
+            transform: "rotateY(90deg) rotateX(-90deg)", transformOrigin: "bottom left"
+          }} />
+          {/* Front Wall (Main Entry facade with columns) */}
+          <div style={{
+            position: "absolute", left: "55px", top: "80px", width: "85px", height: "55px",
+            background: "linear-gradient(to top, #5D4037, #8D6E63)", // Stone brick texture
+            border: `1.5px solid ${t.border}`,
+            transform: "rotateX(-90deg)", transformOrigin: "bottom center",
+            transformStyle: "preserve-3d"
+          }}>
+            {/* Glass Bay Window */}
+            <div style={{
+              position: "absolute", left: "6px", bottom: "6px", width: "42px", height: "38px",
+              background: "rgba(0, 229, 255, 0.15)", border: "2px solid #212121", borderRadius: "3px",
+              transformStyle: "preserve-3d"
+            }}>
+              {/* Warm interior lighting effect */}
+              <motion.div
+                animate={{ opacity: [0.4, 0.8, 0.4] }}
+                transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                style={{ position: "absolute", inset: 0, background: "rgba(255, 193, 7, 0.35)" }}
+              />
+            </div>
+            {/* Double Solid Wood Door */}
+            <div style={{
+              position: "absolute", right: "6px", bottom: 0, width: "24px", height: "42px",
+              background: "#3E2723", border: "1.5px solid #1A0E07", borderRadius: "2px 2px 0 0",
+              display: "flex", gap: "2px", padding: "2px"
+            }}>
+              <div style={{ flex: 1, background: "#4E342E", borderRight: "1px solid #1A0E07", position: "relative" }}>
+                <div style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#D49D42", position: "absolute", top: "50%", right: "1px" }} />
+              </div>
+              <div style={{ flex: 1, background: "#4E342E", position: "relative" }}>
+                <div style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#D49D42", position: "absolute", top: "50%", left: "1px" }} />
+              </div>
+            </div>
+          </div>
+
+          {/* E. VILLA FIRST FLOOR (Cantilevered Stucco Unit sitting at Z = 55px) */}
+          <div style={{
+            position: "absolute", left: "40px", top: "15px", width: "105px", height: "65px",
+            transformStyle: "preserve-3d", transform: "translateZ(55px)"
+          }}>
+            {/* Back Wall */}
+            <div style={{
+              position: "absolute", left: 0, top: 0, width: "105px", height: "44px",
+              background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.15)",
+              transform: "rotateX(-90deg)", transformOrigin: "bottom center"
+            }} />
+            {/* Left Wall */}
+            <div style={{
+              position: "absolute", left: 0, top: 0, width: "65px", height: "44px",
+              background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.15)",
+              transform: "rotateY(90deg) rotateX(-90deg)", transformOrigin: "bottom left"
+            }} />
+            {/* Right Wall */}
+            <div style={{
+              position: "absolute", left: 0, top: 0, width: "65px", height: "44px",
+              background: "#ECEFF1", border: "1px solid rgba(0,0,0,0.15)",
+              transform: "rotateY(90deg) rotateX(-90deg)", transformOrigin: "bottom left"
+            }} />
+            {/* Front Wall (Cantilever White Stucco with wood louvers) */}
+            <div style={{
+              position: "absolute", left: 0, top: "65px", width: "105px", height: "44px",
+              background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.15)",
+              transform: "rotateX(-90deg)", transformOrigin: "bottom center",
+              transformStyle: "preserve-3d"
+            }}>
+              {/* Sliding Glass Balcony Doors */}
+              <div style={{ position: "absolute", left: "8px", bottom: "4px", width: "52px", height: "32px", background: "rgba(0, 229, 255, 0.18)", border: "1.5px solid #2A2A2A", borderRadius: "2px" }}>
+                <div style={{ position: "absolute", inset: 0, background: "rgba(255, 235, 59, 0.2)" }} />
+              </div>
+              {/* Wood Lath Louver Accent panels */}
+              <div style={{ position: "absolute", right: "8px", bottom: "4px", width: "32px", height: "32px", background: "repeating-linear-gradient(90deg, #A1887F 0px, #A1887F 3px, #7E57C2 3px, #7E57C2 5px)", borderRadius: "1px", border: "1px solid #8D6E63" }} />
+            </div>
+
+            {/* Glass Balcony Railing (wraps around cantilever edges at Z = 44px) */}
+            <div style={{
+              position: "absolute", left: "-6px", top: "68px", width: "117px", height: "14px",
+              background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.5)",
+              borderRadius: "1px", transformStyle: "preserve-3d", transform: "translateZ(44px) rotateX(-90deg)", transformOrigin: "bottom center"
+            }}>
+              {/* Balcony Railing Left Return */}
+              <div style={{ position: "absolute", width: "22px", height: "14px", background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.5)", transform: "rotateY(-90deg) translateZ(0px)", transformOrigin: "left center" }} />
+            </div>
+          </div>
+
+          {/* F. SLOPED CLAY-TILE LUXURY ROOFS (sitting at Z = 100px) */}
+          <div style={{
+            position: "absolute", left: "35px", top: "12px", width: "115px", height: "70px",
+            transformStyle: "preserve-3d", transform: "translateZ(100px)"
+          }}>
+            {/* Front Sloped Roof Panel */}
+            <div style={{
+              position: "absolute", width: "115px", height: "38px",
+              background: "repeating-linear-gradient(0deg, #A44E28 0px, #A44E28 5px, #8C2D11 5px, #8C2D11 7px)", // Red clay tiles
+              border: "1px solid #7B240B",
+              transform: "translate3d(0, 35px, 0) rotateX(25deg)", transformOrigin: "bottom center"
+            }} />
+            {/* Back Sloped Roof Panel */}
+            <div style={{
+              position: "absolute", width: "115px", height: "38px",
+              background: "repeating-linear-gradient(0deg, #A44E28 0px, #A44E28 5px, #8C2D11 5px, #8C2D11 7px)",
+              border: "1px solid #7B240B",
+              transform: "translate3d(0, 35px, 0) rotateX(-25deg)", transformOrigin: "top center"
+            }} />
+          </div>
+
+          {/* G. OUTDOOR VEGETATION & GARDENS (Lawn ornaments) */}
+          {/* Cypress Tree 1 */}
+          <div style={{
+            position: "absolute", left: "100px", top: "15px", width: "12px", height: "36px",
+            transformStyle: "preserve-3d", transform: "translateZ(0px) rotateX(-90deg)", transformOrigin: "bottom center"
+          }}>
+            <div style={{ position: "absolute", bottom: 0, left: "4px", width: "3px", height: "8px", background: "#5D4037" }} />
+            <div style={{ position: "absolute", bottom: "8px", left: 0, width: "12px", height: "28px", background: "linear-gradient(to bottom, #1B5E20, #2E7D32)", clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)" }} />
+            <div style={{ position: "absolute", bottom: "8px", left: 0, width: "12px", height: "28px", background: "linear-gradient(to bottom, #1B5E20, #2E7D32)", clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)", transform: "rotateY(90deg)" }} />
+          </div>
+          {/* Cypress Tree 2 */}
+          <div style={{
+            position: "absolute", left: "15px", top: "10px", width: "12px", height: "36px",
+            transformStyle: "preserve-3d", transform: "translateZ(0px) rotateX(-90deg)", transformOrigin: "bottom center"
+          }}>
+            <div style={{ position: "absolute", bottom: 0, left: "4px", width: "3px", height: "8px", background: "#5D4037" }} />
+            <div style={{ position: "absolute", bottom: "8px", left: 0, width: "12px", height: "28px", background: "linear-gradient(to bottom, #1B5E20, #2E7D32)", clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)" }} />
+            <div style={{ position: "absolute", bottom: "8px", left: 0, width: "12px", height: "28px", background: "linear-gradient(to bottom, #1B5E20, #2E7D32)", clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)", transform: "rotateY(90deg)" }} />
+          </div>
+
+          {/* H. VOLUMETRIC SPORTS SEDAN CAR (Parked on Driveway) */}
+          <div style={{
+            position: "absolute", left: "150px", top: "80px", width: "24px", height: "45px",
+            transformStyle: "preserve-3d", transform: "translateZ(4px)" // sitting on driveway
+          }}>
+            {/* Car Chassis (Gold sports car body) */}
+            <div style={{
+              position: "absolute", inset: 0,
+              background: t.gold, border: `1.5px solid ${t.goldLight}`, borderRadius: "4px",
+              transformStyle: "preserve-3d"
+            }}>
+              {/* Car Side Left */}
+              <div style={{ position: "absolute", left: 0, top: 0, width: "4px", height: "45px", background: "#9E782F", transform: "rotateY(-90deg)", transformOrigin: "left center" }} />
+              {/* Car Side Right */}
+              <div style={{ position: "absolute", left: "24px", top: 0, width: "4px", height: "45px", background: "#9E782F", transform: "rotateY(90deg)", transformOrigin: "left center" }} />
+              {/* Car Bumper Front */}
+              <div style={{ position: "absolute", left: 0, top: "45px", width: "24px", height: "4px", background: "#5D4037", transform: "rotateX(-90deg)", transformOrigin: "top center" }} />
+              {/* Car Bumper Back */}
+              <div style={{ position: "absolute", left: 0, top: 0, width: "24px", height: "4px", background: "#5D4037", transform: "rotateX(90deg)", transformOrigin: "top center" }} />
+
+              {/* Car Cabin */}
+              <div style={{
+                position: "absolute", left: "3px", top: "10px", width: "18px", height: "20px",
+                background: "#111", border: "1px solid rgba(255,255,255,0.18)", borderRadius: "2px",
+                transform: "translateZ(4px)"
+              }} />
+            </div>
+          </div>
+
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+
 function Building3D({ numFloors = 9, floorH = 30, bW = 110, bD = 64, t, windowData, animated = true, small = false }) {
   return (
     <div style={{ transform: "perspective(900px) rotateX(8deg)", transformStyle: "preserve-3d" }}>
@@ -613,7 +940,7 @@ function Preloader({ onComplete, t }) {
   const windowData = useMemo(() =>
     Array.from({ length: NF }, () => ({
       front: Array.from({ length: 3 }, () => Math.random() > 0.28),
-      side:  Math.random() > 0.38,
+      side: Math.random() > 0.38,
     })), []);
 
   const stars = useMemo(() =>
@@ -642,6 +969,29 @@ function Preloader({ onComplete, t }) {
         overflow: "hidden",
       }}
     >
+      {/* Skip Intro Button */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.7 }}
+        whileHover={{ opacity: 1, scale: 1.05 }}
+        onClick={onComplete}
+        style={{
+          position: "absolute", right: 24, top: 24, zIndex: 10,
+          background: "rgba(255, 255, 255, 0.08)",
+          border: `1.5px solid ${t.border}`,
+          borderRadius: "20px",
+          color: t.text1,
+          padding: "8px 18px",
+          fontSize: "11px",
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          cursor: "pointer",
+          backdropFilter: "blur(6px)",
+          transition: "border-color 0.25s, background-color 0.25s"
+        }}
+      >
+        Skip Intro
+      </motion.button>
       {/* Sky */}
       {t.isDark ? <NightSky stars={stars} /> : <DaySky />}
 
@@ -700,24 +1050,26 @@ function Preloader({ onComplete, t }) {
 
       {/* Progress bar */}
       <motion.div
-        style={{ position: "absolute", bottom: 0, left: 0, height: 3, zIndex: 3,
-          background: `linear-gradient(90deg, ${t.terra}, ${t.gold})` }}
+        style={{
+          position: "absolute", bottom: 0, left: 0, height: 3, zIndex: 3,
+          background: `linear-gradient(90deg, ${t.terra}, ${t.gold})`
+        }}
         initial={{ width: "0%" }} animate={{ width: "100%" }}
         transition={{ duration: 4.4, ease: "easeInOut" }}
       />
 
       {/* Corner ornaments */}
-      {[0,1,2,3].map((qi) => (
+      {[0, 1, 2, 3].map((qi) => (
         <motion.div key={qi}
           initial={{ opacity: 0 }} animate={{ opacity: 0.45 }} transition={{ delay: 0.5 }}
           style={{
             position: "absolute", width: 40, height: 40, zIndex: 3,
             [qi < 2 ? "top" : "bottom"]: 22,
             [qi % 2 === 0 ? "left" : "right"]: 22,
-            borderTop:    qi < 2 ? `1.5px solid ${t.terra}` : "none",
+            borderTop: qi < 2 ? `1.5px solid ${t.terra}` : "none",
             borderBottom: qi >= 2 ? `1.5px solid ${t.terra}` : "none",
-            borderLeft:   qi % 2 === 0 ? `1.5px solid ${t.terra}` : "none",
-            borderRight:  qi % 2 !== 0 ? `1.5px solid ${t.terra}` : "none",
+            borderLeft: qi % 2 === 0 ? `1.5px solid ${t.terra}` : "none",
+            borderRight: qi % 2 !== 0 ? `1.5px solid ${t.terra}` : "none",
           }}
         />
       ))}
@@ -750,10 +1102,10 @@ function Navbar({ t, isDark, onToggle }) {
   }, []);
 
   const links = [
-    { label: "Home",     href: "#home"     },
+    { label: "Home", href: "#home" },
     { label: "Services", href: "#services" },
-    { label: "About",    href: "#about"    },
-    { label: "Contact",  href: "#contact"  },
+    { label: "About", href: "#about" },
+    { label: "Contact", href: "#contact" },
   ];
 
   return (
@@ -818,9 +1170,11 @@ function Navbar({ t, isDark, onToggle }) {
         {open && (
           <motion.div
             initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }}
-            style={{ position: "absolute", top: 72, left: 0, right: 0,
+            style={{
+              position: "absolute", top: 72, left: 0, right: 0,
               background: t.glass, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-              padding: "20px 5%", borderBottom: `1px solid ${t.border}` }}
+              padding: "20px 5%", borderBottom: `1px solid ${t.border}`
+            }}
           >
             {links.map((lk) => (
               <a key={lk.label} href={lk.href} onClick={() => setOpen(false)}
@@ -848,7 +1202,7 @@ function AnimatedCounter({ value, duration = 2, delay = 0.5 }) {
 
   useEffect(() => {
     if (!inView || !isNumber) return;
-    
+
     const target = parseInt(value.replace(/[^0-9]/g, ""), 10);
     if (isNaN(target)) return;
 
@@ -868,7 +1222,7 @@ function AnimatedCounter({ value, duration = 2, delay = 0.5 }) {
         animationFrameId = requestAnimationFrame(updateCount);
         return;
       }
-      
+
       if (t >= duration) {
         setCount(end);
       } else {
@@ -952,7 +1306,7 @@ function Hero({ t, isDark }) {
   const heroWindowData = useMemo(() =>
     Array.from({ length: 6 }, () => ({
       front: Array.from({ length: 3 }, () => Math.random() > 0.25),
-      side:  Math.random() > 0.35,
+      side: Math.random() > 0.35,
     })), []);
 
   const heroStars = useMemo(() =>
@@ -1059,7 +1413,7 @@ function Hero({ t, isDark }) {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.28, duration: 0.6 }}
           style={{ display: "flex", gap: 44, marginTop: 64, paddingTop: 36, borderTop: `1px solid ${t.border}`, flexWrap: "wrap" }}
         >
-          {[["100+", "Properties Dealt"], ["11", "Services Offered"], ["Trusted", "Since Day One"]].map(([num, lbl]) => (
+          {[["10k+", "Properties Dealt"], ["11", "Services Offered"], ["Trusted", "Since Day One"]].map(([num, lbl]) => (
             <div key={lbl}>
               <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 38, fontWeight: 600, color: t.text1, lineHeight: 1 }}>
                 <AnimatedCounter value={num} delay={1.4} duration={1.6} />
@@ -1100,7 +1454,7 @@ function Hero({ t, isDark }) {
                 boxShadow: "0 0 40px 14px rgba(255,200,0,0.35)",
               }} />
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.85 }} transition={{ delay: 0.4 }}>
-                <Cloud left="6%"  top="24%" scale={0.75} />
+                <Cloud left="6%" top="24%" scale={0.75} />
               </motion.div>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.85 }} transition={{ delay: 0.7 }}>
                 <Cloud left="54%" top="16%" scale={0.6} />
@@ -1111,12 +1465,9 @@ function Hero({ t, isDark }) {
         {/* Mini city silhouette */}
         <CitySilhouette t={t} />
 
-        {/* Small 3D building */}
-        <div style={{ position: "relative", zIndex: 2, marginBottom: 18 }}>
-          <Building3D
-            numFloors={6} floorH={26} bW={80} bD={48}
-            t={t} windowData={heroWindowData} animated={false} small
-          />
+        {/* 3D Building */}
+        <div style={{ position: "relative", zIndex: 2, marginBottom: 40 }}>
+          <Building3D numFloors={6} floorH={30} bW={110} bD={64} t={t} windowData={heroWindowData} animated />
         </div>
 
       </motion.div>
@@ -1129,12 +1480,11 @@ function Hero({ t, isDark }) {
 // ══════════════════════════════════════════════════════════════
 function About({ t }) {
   const deals = [
-    { label: "Buy Property",     Icon: Home },
-    { label: "Sell Property",    Icon: Tag },
-    { label: "Rent / Lease",     Icon: Key },
+    { label: "Buy Property", Icon: Home },
+    { label: "Sell Property", Icon: Tag },
+    { label: "Rent / Lease", Icon: Key },
     { label: "Brand Franchisee", Icon: Award },
-    { label: "Food & Fun Zone",  Icon: Utensils },
-    { label: "Movie Theatre",    Icon: Film },
+    { label: "Construction", Icon: HardHat },
   ];
 
   return (
@@ -1177,34 +1527,40 @@ function About({ t }) {
                 return (
                   <FadeUp key={deal.label} delay={0.08 + i * 0.07}>
                     <motion.div
-                      whileHover={{ scale: 1.04, y: -4 }} transition={spring}
+                      whileHover={{
+                        scale: 1.04,
+                        y: -4,
+                        borderColor: `${t.terra}88`,
+                        boxShadow: `0 10px 30px ${t.terra}22`
+                      }}
+                      transition={spring}
                       style={{
                         background: t.card, border: `1px solid ${t.border}`,
                         padding: "22px 18px", borderRadius: 10, cursor: "default",
-                        transition: "border-color 0.25s, box-shadow 0.25s",
                         boxShadow: `0 2px 8px ${t.shadow}`,
                         display: "flex",
                         flexDirection: "column",
                         gap: 12,
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${t.terra}88`; e.currentTarget.style.boxShadow = `0 10px 30px ${t.terra}22`; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = t.border; e.currentTarget.style.boxShadow = `0 2px 8px ${t.shadow}`; }}
                     >
-                      <div style={{
-                        width: 40, height: 40,
-                        background: `${t.terra}14`,
-                        color: t.terra,
-                        borderRadius: 8,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        transition: "all 0.3s",
-                      }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = t.terra; e.currentTarget.style.color = "#FFF"; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = `${t.terra}14`; e.currentTarget.style.color = t.terra; }}
+                      <motion.div
+                        whileHover={{
+                          backgroundColor: t.terra,
+                          color: "#FFF"
+                        }}
+                        style={{
+                          width: 40, height: 40,
+                          background: `${t.terra}14`,
+                          color: t.terra,
+                          borderRadius: 8,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          transition: "background-color 0.25s, color 0.25s",
+                        }}
                       >
                         <DealIcon size={18} />
-                      </div>
+                      </motion.div>
                       <div style={{ color: t.text1, fontWeight: 500, fontSize: 13, letterSpacing: "0.04em", lineHeight: 1.4 }}>{deal.label}</div>
                     </motion.div>
                   </FadeUp>
@@ -1229,7 +1585,7 @@ function TiltCard({ children, t }) {
     const r = cardRef.current?.getBoundingClientRect();
     if (!r) return;
     const x = (e.clientX - r.left) / r.width;
-    const y = (e.clientY - r.top)  / r.height;
+    const y = (e.clientY - r.top) / r.height;
     setTilt({ rx: (y - 0.5) * -14, ry: (x - 0.5) * 14, active: true });
   }, []);
 
@@ -1337,7 +1693,7 @@ const SERVICES = [
     title: "Agricultural Land / Plots",
     desc: "Fertile agricultural land and plots for investment or farming.",
     Icon: Tractor,
-    category: "commercial",
+    category: "agriculture",
     details: "High-yield agricultural land and farm plots across Chhattisgarh. Verified soil fertility, water source availability, and clear land records. Perfect for commercial farming or long-term wealth appreciation.",
     deliverables: ["Government Khatauni Verification", "Irrigation Canal & Well Studies", "Soil Composition Report", "Clear Boundary Survey Maps", "Farming Machinery Access Plan"]
   },
@@ -1372,6 +1728,30 @@ const SERVICES = [
     category: "design",
     details: "Turn key residential and commercial interior solutions. Elegant styling, space-maximising modular furniture, bespoke false-ceiling illumination, and carefully selected color palettes to reflect your personality.",
     deliverables: ["Complete 3D Interior Mockups", "Modular Wardrobe & Kitchen Plans", "False Ceiling & Lighting Layouts", "Texture & Wall Polish Selector", "Accompanying Estimate Reports"]
+  },
+  {
+    title: "Agro-Forestry / Orchards",
+    desc: "Managed timber and fruit orchards for passive agro-income.",
+    Icon: Trees,
+    category: "agriculture",
+    details: "Eco-friendly farmland plots designed for managed timber, fruit orchards, and sustainable agro-forestry projects. Complete support for high-yield sapling sourcing, automated drip irrigation, and security setups.",
+    deliverables: ["Drip Irrigation Integration", "Managed Sapling Sourcing", "Soil Nutrition Log Reports", "Secure Perimeter Fencing", "Yield Estimation Guides"]
+  },
+  {
+    title: "Greenhouse / Polyhouse",
+    desc: "Climate-controlled high-yield crop cultivation systems.",
+    Icon: Globe,
+    category: "agriculture",
+    details: "Strategically located farm plots optimized for greenhouse or polyhouse structures. Excellent for flowers, organic vegetables, and hydroponic cash crops with access to power and local trade routes.",
+    deliverables: ["Structure Foundations Planning", "Canal Water Sourcing Studies", "Subsidy Eligibility Reports", "Soil & PH Testing", "Market Logistics Consults"]
+  },
+  {
+    title: "Structural Construction",
+    desc: "Turnkey building construction with premium structural integrity.",
+    Icon: HardHat,
+    category: "design",
+    details: "Bespoke building construction services from excavation and foundation laying to brickwork, RCC casting, and structural completion. Quality-controlled materials and professional project management.",
+    deliverables: ["Soil & Foundation Analysis", "RCC Structural Design Mapping", "High-Quality Raw Material Sourcing", "On-site Supervision Reports", "Turnkey Construction Handover"]
   }
 ];
 
@@ -1446,114 +1826,153 @@ function ServiceCard({ svc, idx, t, onSelect }) {
 }
 
 function Residential3D({ t }) {
+  const dropSpring = { type: "spring", stiffness: 100, damping: 15 };
+  const popSpring = { type: "spring", stiffness: 140, damping: 12 };
+
   return (
     <div style={{ transformStyle: "preserve-3d", width: "200px", height: "220px", position: "relative" }}>
-      {/* 1. FLOOR (Ground Floor Wood Floor) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "160px",
-        marginLeft: "-100px", marginTop: "-80px",
-        background: `repeating-linear-gradient(90deg, #301A0E 0px, #301A0E 5px, #23120A 5px, #23120A 10px)`,
-        border: `1px solid ${t.border}`,
-        transform: "translate3d(0px, 110px, 0px) rotateX(90deg)",
-        transformStyle: "preserve-3d",
-      }}>
-        {/* Colorful Living Room Rug */}
+      {/* 1. FIELD BASE PLATE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 200px, 0px) rotateX(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 110px, 0px) rotateX(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.15 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "160px",
+          marginLeft: "-100px", marginTop: "-80px",
+          background: "repeating-linear-gradient(90deg, #301A0E 0px, #301A0E 5px, #23120A 5px, #23120A 10px)",
+          border: `1px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      >
         <div style={{
-          position: "absolute", left: "15px", top: "40px",
+          position: "absolute",
+          left: "15px", top: "40px",
           width: "110px", height: "80px",
           background: `linear-gradient(135deg, ${t.terra}, ${t.gold})`,
           borderRadius: "8px",
           boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-          opacity: 0.85,
+          opacity: 0.85
         }} />
-      </div>
 
-      {/* 2. FIRST FLOOR FLOOR PLATE (Light Laminate) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "160px",
-        marginLeft: "-100px", marginTop: "-80px",
-        background: `repeating-linear-gradient(90deg, #E5C39C 0px, #E5C39C 6px, #D4AF83 6px, #D4AF83 12px)`,
-        border: `1px solid ${t.border}`,
-        transform: "translate3d(0px, 0px, 0px) rotateX(90deg)",
-        transformStyle: "preserve-3d",
-      }} />
+        {/* 3D SIDE WALLS FOR WOOD BLOCK THICKNESS */}
+        <div style={{
+          position: "absolute", left: 0, top: "160px", width: "200px", height: "16px",
+          background: "linear-gradient(to bottom, #23120A, #120905)",
+          transform: "rotateX(-90deg)", transformOrigin: "top center"
+        }} />
+        <div style={{
+          position: "absolute", left: 0, top: 0, width: "200px", height: "16px",
+          background: "linear-gradient(to bottom, #301A0E, #180C07)",
+          transform: "rotateX(90deg)", transformOrigin: "top center"
+        }} />
+        <div style={{
+          position: "absolute", left: 0, top: 0, width: "16px", height: "160px",
+          background: "linear-gradient(to bottom, #23120A, #120905)",
+          transform: "rotateY(-90deg)", transformOrigin: "left center"
+        }} />
+        <div style={{
+          position: "absolute", left: "200px", top: 0, width: "16px", height: "160px",
+          background: "linear-gradient(to bottom, #301A0E, #180C07)",
+          transform: "rotateY(90deg)", transformOrigin: "left center"
+        }} />
+      </motion.div>
 
-      {/* 3. ROOF PLATE (Charcoal concrete with terracotta trim) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "160px",
-        marginLeft: "-100px", marginTop: "-80px",
-        background: "#2A2A2A",
-        border: `2px solid ${t.terra}`,
-        transform: "translate3d(0px, -110px, 0px) rotateX(90deg)",
-        transformStyle: "preserve-3d",
-      }} />
+      {/* 2. FIRST FLOOR FLOOR PLATE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 80px, 0px) rotateX(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 0px, 0px) rotateX(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.85 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "160px",
+          marginLeft: "-100px", marginTop: "-80px",
+          background: "repeating-linear-gradient(90deg, #E5C39C 0px, #E5C39C 6px, #D4AF83 6px, #D4AF83 12px)",
+          border: `1px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      />
 
-      {/* 4. BACK WALL (Split wallpaper) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "220px",
-        marginLeft: "-100px", marginTop: "-110px",
-        border: `1.5px solid ${t.border}`,
-        transform: "translate3d(0px, 0px, -80px)",
-        transformStyle: "preserve-3d",
-      }}>
-        {/* Ground Floor Wall Panel (Dark Forest Green) */}
+      {/* 3. ROOF PLATE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, -200px, 0px) rotateX(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, -110px, 0px) rotateX(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 1.45 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "160px",
+          marginLeft: "-100px", marginTop: "-80px",
+          background: "#2A2A2A",
+          border: `2px solid ${t.terra}`,
+          transformStyle: "preserve-3d"
+        }}
+      />
+
+      {/* 4. BACK WALL */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 0px, -160px)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 0px, -80px)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.35 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "220px",
+          marginLeft: "-100px", marginTop: "-110px",
+          border: `1.5px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      >
         <div style={{
           position: "absolute", left: 0, bottom: 0,
           width: "200px", height: "110px",
           background: "#16231C",
           borderTop: `2px solid ${t.gold}50`,
-          display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "10px",
+          display: "flex", flexDirection: "column", justifyBetween: "space-between", padding: "10px"
         }}>
-          {/* Framed Wall Painting */}
           <div style={{
             width: "55px", height: "40px",
             background: "linear-gradient(to right, #FF7E5F, #FEB47B)",
             borderRadius: "4px",
             border: `2px solid ${t.gold}`,
             boxShadow: "0 4px 10px rgba(0,0,0,0.35)",
-            marginTop: "4px",
+            marginTop: "4px"
           }} />
         </div>
-
-        {/* First Floor Wall Panel (Terracotta plaster) */}
         <div style={{
           position: "absolute", left: 0, top: 0,
           width: "200px", height: "110px",
           background: t.isDark ? "#2C140E" : "#F4ECE1",
           borderBottom: `1px solid ${t.border}`,
-          padding: "10px",
+          padding: "10px"
         }}>
-          {/* Accent Panel or Wall lights */}
           <div style={{
             position: "absolute", left: "20px", top: "15px",
             width: "35px", height: "20px",
             background: "linear-gradient(45deg, #FF9E79, #FFA500)",
             borderRadius: "3px",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
           }} />
         </div>
-      </div>
+      </motion.div>
 
-      {/* 5. LEFT WALL (Sand-pearl plaster) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "160px", height: "220px",
-        marginLeft: "-80px", marginTop: "-110px",
-        background: t.isDark ? "#23150F" : "#EBE1D2",
-        border: `1.5px solid ${t.border}`,
-        transform: "translate3d(-100px, 0px, 0px) rotateY(90deg)",
-        transformStyle: "preserve-3d",
-      }}>
-        {/* Bookshelf on Ground Floor */}
+      {/* 5. LEFT WALL */}
+      <motion.div
+        initial={{ transform: "translate3d(-180px, 0px, 0px) rotateY(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(-100px, 0px, 0px) rotateY(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.45 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "160px", height: "220px",
+          marginLeft: "-80px", marginTop: "-110px",
+          background: t.isDark ? "#23150F" : "#EBE1D2",
+          border: `1.5px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      >
         <div style={{
           position: "absolute", left: "20px", bottom: "10px",
           width: "18px", height: "80px",
@@ -1562,319 +1981,245 @@ function Residential3D({ t }) {
           borderRadius: "2px",
           boxShadow: "0 4px 10px rgba(0,0,0,0.35)",
           transform: "translateZ(8px)",
-          display: "flex", flexDirection: "column", justifyContent: "space-around", alignItems: "center", padding: "4px 0",
+          display: "flex", flexDirection: "column", justifyAround: "space-around", alignItems: "center",
+          padding: "4px 0"
         }}>
-          {[1, 2, 3].map((bi) => (
-            <div key={bi} style={{
-              width: "12px", height: "8px",
-              background: bi === 1 ? "#FF5252" : bi === 2 ? "#3F51B5" : "#4CAF50",
-              borderRadius: "1px",
-            }} />
+          {[1, 2, 3].map((v) => (
+            <div key={v} style={{ width: "12px", height: "8px", background: v === 1 ? "#FF5252" : v === 2 ? "#3F51B5" : "#4CAF50", borderRadius: "1px" }} />
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      {/* ── GROUND FLOOR FURNISHING ── */}
-      {/* L-Shaped Sectional Sofa */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "100px", height: "30px",
-        marginLeft: "-85px", marginTop: "55px",
-        transform: "translate3d(0px, 20px, 0px)",
-      }}>
-        {/* Main Base */}
-        <div style={{
-          position: "absolute", width: "95px", height: "14px",
-          background: t.terra,
-          border: "1px solid rgba(0,0,0,0.18)",
-          boxShadow: `0 4px 8px rgba(0,0,0,0.35)`,
-          borderRadius: "3px",
-          transform: "translate3d(0px, 12px, -30px)",
-        }} />
-        {/* Sofa Backrest */}
-        <div style={{
-          position: "absolute", width: "95px", height: "20px",
-          background: t.terraDark,
-          borderRadius: "3px",
-          transform: "translate3d(0px, -6px, -36px) rotateX(4deg)",
-        }} />
-        {/* L-Cushion extending forward */}
-        <div style={{
-          position: "absolute", width: "35px", height: "14px",
-          background: t.terra,
-          border: "1px solid rgba(0,0,0,0.18)",
-          borderRadius: "3px",
-          transform: "translate3d(-10px, 12px, -5px)",
-        }} />
-      </div>
+      {/* 6. SOFA */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 20px, 0px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 20px, 0px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.6 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "100px", height: "30px",
+          marginLeft: "-85px", marginTop: "55px"
+        }}
+      >
+        <div style={{ position: "absolute", width: "95px", height: "14px", background: t.terra, border: "1px solid rgba(0,0,0,0.18)", boxShadow: "0 4px 8px rgba(0,0,0,0.35)", borderRadius: "3px", transform: "translate3d(0px, 12px, -30px)" }} />
+        <div style={{ position: "absolute", width: "95px", height: "20px", background: t.terraDark, borderRadius: "3px", transform: "translate3d(0px, -6px, -36px) rotateX(4deg)" }} />
+        <div style={{ position: "absolute", width: "35px", height: "14px", background: t.terra, border: "1px solid rgba(0,0,0,0.18)", borderRadius: "3px", transform: "translate3d(-10px, 12px, -5px)" }} />
+      </motion.div>
 
-      {/* Coffee Table */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "45px", height: "20px",
-        marginLeft: "-15px", marginTop: "85px",
-        transform: "translate3d(0px, 5px, 10px)",
-      }}>
-        {/* Glass Top */}
-        <div style={{
-          position: "absolute", width: "45px", height: "4px",
-          background: "rgba(254, 208, 73, 0.45)",
-          borderRadius: "3px",
-          border: `1.5px solid ${t.gold}`,
-          boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
-        }} />
-        {/* Tiny potted flower */}
-        <div style={{
-          position: "absolute", left: "18px", top: "-10px",
-          width: "9px", height: "9px",
-          borderRadius: "50%",
-          background: "#FF5252",
-          border: "1.5px solid #4CAF50",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
-        }} />
-      </div>
+      {/* 7. COFFEE TABLE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 5px, 10px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 5px, 10px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.7 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "45px", height: "20px",
+          marginLeft: "-15px", marginTop: "85px"
+        }}
+      >
+        <div style={{ position: "absolute", width: "45px", height: "4px", background: "rgba(254, 208, 73, 0.45)", borderRadius: "3px", border: `1.5px solid ${t.gold}`, boxShadow: "0 4px 8px rgba(0,0,0,0.25)" }} />
+        <div style={{ position: "absolute", left: "18px", top: "-10px", width: "9px", height: "9px", borderRadius: "50%", background: "#FF5252", border: "1.5px solid #4CAF50", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }} />
+      </motion.div>
 
-      {/* TV Screen with animated sunset flow and cyan glow */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "70px", height: "42px",
-        marginLeft: "15px", marginTop: "20px",
-        transform: "translate3d(0px, 5px, -77px)",
-      }}>
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "#080808",
-          border: "2px solid rgba(255,255,255,0.15)",
-          borderRadius: "4px",
-          boxShadow: "0 0 20px rgba(0,229,255,0.45)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          overflow: "hidden",
-        }}>
+      {/* 8. TV SCREEN */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 5px, -77px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 5px, -77px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.8 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "70px", height: "42px",
+          marginLeft: "15px", marginTop: "20px"
+        }}
+      >
+        <div style={{ position: "absolute", inset: 0, background: "#080808", border: "2px solid rgba(255,255,255,0.15)", borderRadius: "4px", boxShadow: "0 0 20px rgba(0,229,255,0.45)", display: "flex", alignItems: "center", justifyCenter: "center", overflow: "hidden" }}>
           <motion.div
             animate={{ opacity: [0.4, 0.85, 0.4] }}
             transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
-            style={{
-              position: "absolute", inset: 0,
-              background: "linear-gradient(45deg, #00C9FF, #92FE9D)",
-            }}
+            style={{ position: "absolute", inset: 0, background: "linear-gradient(45deg, #00C9FF, #92FE9D)" }}
           />
           <div style={{ color: "#FFF", fontSize: "7px", fontWeight: 700, zIndex: 2, letterSpacing: "1px" }}>URBAN BRICKS</div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* ── FIRST FLOOR FURNISHING ── */}
-      {/* Luxury Bed */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "80px", height: "35px",
-        marginLeft: "-80px", marginTop: "-55px",
-        transform: "translate3d(10px, 15px, -20px)",
-      }}>
-        {/* Bed Base */}
-        <div style={{
-          position: "absolute", width: "70px", height: "18px",
-          background: t.isDark ? "#1E0E06" : "#E2D8CC",
-          border: "1px solid rgba(0,0,0,0.18)",
-          borderRadius: "3px",
-          transform: "translate3d(0px, 10px, -25px)",
-        }} />
-        {/* Duvet (warm clay saffron) */}
-        <div style={{
-          position: "absolute", width: "70px", height: "16px",
-          background: `linear-gradient(135deg, ${t.terra}, ${t.gold})`,
-          borderRadius: "3px",
-          transform: "translate3d(0px, 2px, -22px)",
-          boxShadow: "0 3px 6px rgba(0,0,0,0.25)",
-        }} />
-        {/* Pillows */}
-        <div style={{
-          position: "absolute", width: "24px", height: "8px",
-          background: "#FFF",
-          borderRadius: "2px",
-          transform: "translate3d(8px, -2px, -50px)",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
-        }} />
-        <div style={{
-          position: "absolute", width: "24px", height: "8px",
-          background: "#FFF",
-          borderRadius: "2px",
-          transform: "translate3d(38px, -2px, -50px)",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
-        }} />
-      </div>
+      {/* 9. BED */}
+      <motion.div
+        initial={{ transform: "translate3d(10px, 15px, -20px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(10px, 15px, -20px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 1.05 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "80px", height: "35px",
+          marginLeft: "-80px", marginTop: "-55px"
+        }}
+      >
+        <div style={{ position: "absolute", width: "70px", height: "18px", background: t.isDark ? "#1E0E06" : "#E2D8CC", border: "1px solid rgba(0,0,0,0.18)", borderRadius: "3px", transform: "translate3d(0px, 10px, -25px)" }} />
+        <div style={{ position: "absolute", width: "70px", height: "16px", background: `linear-gradient(135deg, ${t.terra}, ${t.gold})`, borderRadius: "3px", transform: "translate3d(0px, 2px, -22px)", boxShadow: "0 3px 6px rgba(0,0,0,0.25)" }} />
+        <div style={{ position: "absolute", width: "24px", height: "8px", background: "#FFF", borderRadius: "2px", transform: "translate3d(8px, -2px, -50px)", boxShadow: "0 1px 3px rgba(0,0,0,0.15)" }} />
+        <div style={{ position: "absolute", width: "24px", height: "8px", background: "#FFF", borderRadius: "2px", transform: "translate3d(38px, -2px, -50px)", boxShadow: "0 1px 3px rgba(0,0,0,0.15)" }} />
+      </motion.div>
 
-      {/* Bedside Lamp with glowing bulb */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "20px", height: "30px",
-        marginLeft: "-90px", marginTop: "-65px",
-        transform: "translate3d(0px, 10px, -65px)",
-      }}>
-        {/* Tiny Table */}
-        <div style={{
-          position: "absolute", width: "16px", height: "12px",
-          background: t.gold,
-          borderRadius: "2px",
-          transform: "translate3d(0px, 14px, 0px)",
-        }} />
-        {/* Glowing bulb */}
-        <div style={{
-          position: "absolute", left: "5px", top: "0px",
-          width: "6px", height: "6px",
-          borderRadius: "50%",
-          background: "#FFE082",
-          boxShadow: "0 0 16px 5px rgba(254,208,73,0.7)",
-        }} />
-      </div>
+      {/* 10. LAMP */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 10px, -65px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 10px, -65px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 1.15 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "20px", height: "30px",
+          marginLeft: "-90px", marginTop: "-65px"
+        }}
+      >
+        <div style={{ position: "absolute", width: "16px", height: "12px", background: t.gold, borderRadius: "2px", transform: "translate3d(0px, 14px, 0px)" }} />
+        <div style={{ position: "absolute", left: "5px", top: "0px", width: "6px", height: "6px", borderRadius: "50%", background: "#FFE082", boxShadow: "0 0 16px 5px rgba(254,208,73,0.7)" }} />
+      </motion.div>
 
-      {/* Study Desk & Laptop with glowing neon-blue screen */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "65px", height: "35px",
-        marginLeft: "20px", marginTop: "-55px",
-        transform: "translate3d(0px, 15px, -30px)",
-      }}>
-        {/* Desk Base */}
-        <div style={{
-          position: "absolute", width: "55px", height: "5px",
-          background: t.isDark ? "#522C1B" : "#B08A6F",
-          borderRadius: "2px",
-          boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
-          transform: "translate3d(0px, 12px, 0px)",
-        }} />
-        {/* Desk Legs */}
+      {/* 11. DESK */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 15px, -30px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 15px, -30px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 1.25 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "65px", height: "35px",
+          marginLeft: "20px", marginTop: "-55px"
+        }}
+      >
+        <div style={{ position: "absolute", width: "55px", height: "5px", background: t.isDark ? "#522C1B" : "#B08A6F", borderRadius: "2px", boxShadow: "0 2px 5px rgba(0,0,0,0.25)", transform: "translate3d(0px, 12px, 0px)" }} />
         <div style={{ position: "absolute", width: "2px", height: "14px", background: "#3A3A3A", transform: "translate3d(2px, 17px, 0px)" }} />
         <div style={{ position: "absolute", width: "2px", height: "14px", background: "#3A3A3A", transform: "translate3d(50px, 17px, 0px)" }} />
-        {/* Open Laptop */}
-        <div style={{
-          position: "absolute",
-          left: "16px", top: "-2px",
-          width: "22px", height: "14px",
-          transform: "translate3d(0px, 0px, 0px) rotateX(-20deg)",
-          transformStyle: "preserve-3d",
-        }}>
-          {/* Laptop base */}
+        <div style={{ position: "absolute", left: "16px", top: "-2px", width: "22px", height: "14px", transform: "translate3d(0px, 0px, 0px) rotateX(-20deg)", transformStyle: "preserve-3d" }}>
           <div style={{ position: "absolute", width: "22px", height: "2px", background: "#A2A2A2", transform: "translate3d(0px, 12px, 0px)" }} />
-          {/* Laptop screen with cyan glow */}
-          <div style={{
-            position: "absolute", width: "22px", height: "14px",
-            background: "#080808",
-            border: "1px solid rgba(255,255,255,0.2)",
-            borderRadius: "2px",
-            boxShadow: "0 0 12px rgba(0,229,255,0.7)",
-            transform: "translate3d(0px, -2px, -6px) rotateX(75deg)",
-          }} />
+          <div style={{ position: "absolute", width: "22px", height: "14px", background: "#080808", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "2px", boxShadow: "0 0 12px rgba(0,229,255,0.7)", transform: "translate3d(0px, -2px, -6px) rotateX(75deg)" }} />
         </div>
-      </div>
+      </motion.div>
 
-      {/* Tall Potted Monstera */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "25px", height: "45px",
-        marginLeft: "65px", marginTop: "-30px",
-        transform: "translate3d(0px, 10px, 35px)",
-      }}>
-        {/* Pot */}
-        <div style={{
-          position: "absolute", bottom: 0, left: "4px",
-          width: "14px", height: "16px",
-          background: "#B24C24",
-          border: "1px solid rgba(0,0,0,0.15)",
-          borderRadius: "1px 1px 4px 4px",
-        }} />
-        {/* Layered monstera leaves */}
+      {/* 12. POTTED MONSTERA */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 10px, 35px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 10px, 35px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 1.35 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "25px", height: "45px",
+          marginLeft: "65px", marginTop: "-30px"
+        }}
+      >
+        <div style={{ position: "absolute", bottom: 0, left: "4px", width: "14px", height: "16px", background: "#B24C24", border: "1px solid rgba(0,0,0,0.15)", borderRadius: "1px 1px 4px 4px" }} />
         <div style={{ position: "absolute", bottom: "14px", left: "1px", width: "20px", height: "20px", borderRadius: "50%", background: "#2E7D32", boxShadow: "0 2px 6px rgba(0,0,0,0.3)" }} />
         <div style={{ position: "absolute", bottom: "24px", left: "6px", width: "12px", height: "12px", borderRadius: "50%", background: "#4CAF50" }} />
-      </div>
+      </motion.div>
     </div>
   );
 }
 
 function Commercial3D({ t }) {
+  const dropSpring = { type: "spring", stiffness: 100, damping: 15 };
+  const popSpring = { type: "spring", stiffness: 140, damping: 12 };
+
   return (
     <div style={{ transformStyle: "preserve-3d", width: "200px", height: "180px", position: "relative" }}>
-      {/* 1. FLOOR (Polished Marble) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "160px",
-        marginLeft: "-100px", marginTop: "-80px",
-        background: `linear-gradient(135deg, #1A1F2C, #0F1219)`,
-        border: `1.5px solid ${t.border}`,
-        boxShadow: `0 0 35px ${t.shadow}`,
-        transform: "translate3d(0px, 90px, 0px) rotateX(90deg)",
-        transformStyle: "preserve-3d",
-      }}>
-        {/* Fine white marble vein */}
+      {/* 1. BASE PLATE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 180px, 0px) rotateX(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 90px, 0px) rotateX(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.15 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "160px",
+          marginLeft: "-100px", marginTop: "-80px",
+          background: "linear-gradient(135deg, #1A1F2C, #0F1219)",
+          border: `1.5px solid ${t.border}`,
+          boxShadow: `0 0 35px ${t.shadow}`,
+          transformStyle: "preserve-3d"
+        }}
+      >
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(45deg, transparent 46%, rgba(255,255,255,0.05) 47%, rgba(255,255,255,0.05) 48%, transparent 49%)" }} />
+
+        {/* 3D SIDE WALLS FOR SLATE BLOCK THICKNESS */}
         <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: "linear-gradient(45deg, transparent 46%, rgba(255,255,255,0.05) 47%, rgba(255,255,255,0.05) 48%, transparent 49%)",
+          position: "absolute", left: 0, top: "160px", width: "200px", height: "16px",
+          background: "linear-gradient(to bottom, #0F1219, #050609)",
+          transform: "rotateX(-90deg)", transformOrigin: "top center"
         }} />
-      </div>
-
-      {/* 2. CEILING SLAB (Warm LEDs panel lights) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "160px",
-        marginLeft: "-100px", marginTop: "-80px",
-        background: "#D1D5DB",
-        border: `1px solid ${t.border}`,
-        transform: "translate3d(0px, -90px, 0px) rotateX(90deg)",
-        transformStyle: "preserve-3d",
-      }}>
-        {/* Embedded spotlight panel glows */}
-        {[
-          { l: "30px", t: "40px" }, { l: "150px", t: "40px" },
-          { l: "30px", t: "110px" }, { l: "150px", t: "110px" }
-        ].map((sp, idx) => (
-          <div key={idx} style={{
-            position: "absolute", left: sp.l, top: sp.t,
-            width: "20px", height: "10px",
-            background: "#FFF",
-            boxShadow: "0 0 15px 4px #FFE082",
-            borderRadius: "2px",
-          }} />
-        ))}
-      </div>
-
-      {/* 3. BACK WALL (Vertical acoustic wooden slats) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "180px",
-        marginLeft: "-100px", marginTop: "-90px",
-        background: `repeating-linear-gradient(90deg, #1E0E06 0px, #1E0E06 6px, #110502 6px, #110502 8px)`,
-        border: `1.5px solid ${t.border}`,
-        transform: "translate3d(0px, 0px, -80px)",
-        transformStyle: "preserve-3d",
-      }}>
-        {/* Central Brand Presentation Wall */}
         <div style={{
-          position: "absolute", left: "35px", top: "40px",
+          position: "absolute", left: 0, top: 0, width: "200px", height: "16px",
+          background: "linear-gradient(to bottom, #1A1F2C, #0C0E14)",
+          transform: "rotateX(90deg)", transformOrigin: "top center"
+        }} />
+        <div style={{
+          position: "absolute", left: 0, top: 0, width: "16px", height: "160px",
+          background: "linear-gradient(to bottom, #0F1219, #050609)",
+          transform: "rotateY(-90deg)", transformOrigin: "left center"
+        }} />
+        <div style={{
+          position: "absolute", left: "200px", top: 0, width: "16px", height: "160px",
+          background: "linear-gradient(to bottom, #1A1F2C, #0C0E14)",
+          transform: "rotateY(90deg)", transformOrigin: "left center"
+        }} />
+      </motion.div>
+
+      {/* 2. CEILING PLATE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, -180px, 0px) rotateX(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, -90px, 0px) rotateX(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 1.15 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "160px",
+          marginLeft: "-100px", marginTop: "-80px",
+          background: "#D1D5DB",
+          border: `1px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      >
+        {[{ l: "30px", t: "40px" }, { l: "150px", t: "40px" }, { l: "30px", t: "110px" }, { l: "150px", t: "110px" }].map((pos, i) => (
+          <div key={i} style={{ position: "absolute", left: pos.l, top: pos.t, width: "20px", height: "10px", background: "#FFF", boxShadow: "0 0 15px 4px #FFE082", borderRadius: "2px" }} />
+        ))}
+      </motion.div>
+
+      {/* 3. BACK WALL */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 0px, -160px)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 0px, -80px)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.35 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "180px",
+          marginLeft: "-100px", marginTop: "-90px",
+          background: "repeating-linear-gradient(90deg, #1E0E06 0px, #1E0E06 6px, #110502 6px, #110502 8px)",
+          border: `1.5px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      >
+        <div style={{
+          position: "absolute",
+          left: "35px", top: "40px",
           width: "130px", height: "70px",
           background: t.isDark ? "#281D1A" : "#ECE4DB",
           border: `1px solid ${t.border}`,
           borderRadius: "6px",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          boxShadow: `0 8px 24px rgba(0,0,0,0.5)`,
-          transform: "translateZ(5px)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+          transform: "translateZ(5px)"
         }}>
-          {/* Glowing Green Brand Badge */}
           <div style={{
             padding: "6px 14px",
             background: "#080808",
@@ -1886,412 +2231,708 @@ function Commercial3D({ t }) {
             fontFamily: "monospace",
             fontSize: "9px",
             fontWeight: 700,
-            letterSpacing: "2px",
+            letterSpacing: "2px"
           }}>
             URBAN BRICKS
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* 4. LEFT WALL (Office grey plaster + Windows) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "160px", height: "180px",
-        marginLeft: "-80px", marginTop: "-90px",
-        background: t.isDark ? "#1E293B" : "#F1F5F9",
-        border: `1.5px solid ${t.border}`,
-        transform: "translate3d(-100px, 0px, 0px) rotateY(90deg)",
-        transformStyle: "preserve-3d",
-      }}>
-        {/* Skyline Window cutout block */}
+      {/* 4. LEFT WALL */}
+      <motion.div
+        initial={{ transform: "translate3d(-180px, 0px, 0px) rotateY(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(-100px, 0px, 0px) rotateY(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.45 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "160px", height: "180px",
+          marginLeft: "-80px", marginTop: "-90px",
+          background: t.isDark ? "#1E293B" : "#F1F5F9",
+          border: `1.5px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      >
         <div style={{
-          position: "absolute", left: "15px", top: "35px",
+          position: "absolute",
+          left: "15px", top: "35px",
           width: "130px", height: "100px",
           background: "#0B0F19",
           borderRadius: "4px",
           border: "2px solid rgba(255,255,255,0.1)",
           overflow: "hidden",
-          position: "relative",
+          position: "relative"
         }}>
-          {/* Cityscape window grids at night */}
-          <div style={{
-            position: "absolute", bottom: 0, left: 0, right: 0, height: "60px",
-            background: "linear-gradient(to top, #020408, transparent)",
-          }} />
-          {[
-            { l: 20, t: 20 }, { l: 50, t: 30 }, { l: 80, t: 15 }, { l: 110, t: 40 },
-            { l: 30, t: 60 }, { l: 70, t: 70 }, { l: 100, t: 55 }
-          ].map((wn, idx) => (
-            <div key={idx} style={{
-              position: "absolute", left: `${wn.l}px`, top: `${wn.t}px`,
-              width: "4px", height: "6px",
-              background: idx % 2 === 0 ? "#FFE082" : "#90CAF9",
-              boxShadow: "0 0 4px rgba(255,224,130,0.8)",
-            }} />
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "60px", background: "linear-gradient(to top, #020408, transparent)" }} />
+          {[{ l: 20, t: 20 }, { l: 50, t: 30 }, { l: 80, t: 15 }, { l: 110, t: 40 }, { l: 30, t: 60 }, { l: 70, t: 70 }, { l: 100, t: 55 }].map((pt, i) => (
+            <div key={i} style={{ position: "absolute", left: `${pt.l}px`, top: `${pt.t}px`, width: "4px", height: "6px", background: i % 2 === 0 ? "#FFE082" : "#90CAF9", boxShadow: "0 0 4px rgba(255,224,130,0.8)" }} />
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      {/* ── INTERIOR FURNISHING ── */}
-      {/* Central Glass-and-Chrome Conference Table */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "110px", height: "30px",
-        marginLeft: "-55px", marginTop: "35px",
-        transform: "translate3d(15px, 20px, 0px)",
-      }}>
-        {/* Table Glass Top */}
-        <div style={{
-          position: "absolute", width: "100px", height: "4px",
-          background: "rgba(255, 255, 255, 0.15)",
-          border: "1.5px solid rgba(0, 229, 255, 0.5)",
-          borderRadius: "6px",
-          boxShadow: "0 6px 15px rgba(0, 229, 255, 0.25)",
-        }} />
-        {/* Chrome support legs */}
+      {/* 5. WORKSTATIONS */}
+      <motion.div
+        initial={{ transform: "translate3d(15px, 20px, 0px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(15px, 20px, 0px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.6 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "110px", height: "30px",
+          marginLeft: "-55px", marginTop: "35px"
+        }}
+      >
+        <div style={{ position: "absolute", width: "100px", height: "4px", background: "rgba(255, 255, 255, 0.15)", border: "1.5px solid rgba(0, 229, 255, 0.5)", borderRadius: "6px", boxShadow: "0 6px 15px rgba(0, 229, 255, 0.25)" }} />
         <div style={{ position: "absolute", width: "4px", height: "22px", background: "#B0BEC5", transform: "translate3d(15px, 4px, -15px)" }} />
         <div style={{ position: "absolute", width: "4px", height: "22px", background: "#B0BEC5", transform: "translate3d(80px, 4px, -15px)" }} />
         <div style={{ position: "absolute", width: "4px", height: "22px", background: "#B0BEC5", transform: "translate3d(15px, 4px, 15px)" }} />
         <div style={{ position: "absolute", width: "4px", height: "22px", background: "#B0BEC5", transform: "translate3d(80px, 4px, 15px)" }} />
-
-        {/* 4 Miniature Executive Chairs */}
-        {[
-          { x: 22, z: -25, r: 0 }, { x: 62, z: -25, r: 0 },
-          { x: 22, z: 25, r: 180 }, { x: 62, z: 25, r: 180 }
-        ].map((ch, idx) => (
-          <div key={idx} style={{
-            transformStyle: "preserve-3d",
-            position: "absolute",
-            left: `${ch.x}px`,
-            transform: `translate3d(0px, 10px, ${ch.z}px) rotateY(${ch.r}deg)`,
-          }}>
-            {/* Chair Seat */}
+        {[{ x: 22, z: -25, r: 0 }, { x: 62, z: -25, r: 0 }, { x: 22, z: 25, r: 180 }, { x: 62, z: 25, r: 180 }].map((chair, i) => (
+          <div key={i} style={{ transformStyle: "preserve-3d", position: "absolute", left: `${chair.x}px`, transform: `translate3d(0px, 10px, ${chair.z}px) rotateY(${chair.r}deg)` }}>
             <div style={{ width: "14px", height: "2px", background: "#212121", borderRadius: "2px" }} />
-            {/* Chair Backrest */}
             <div style={{ width: "14px", height: "14px", background: "#37474F", borderRadius: "2px", transform: "translate3d(0px, -12px, -4px) rotateX(10deg)" }} />
           </div>
         ))}
-      </div>
+      </motion.div>
 
-      {/* Tech Workstation with curved monitor display */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "60px", height: "35px",
-        marginLeft: "35px", marginTop: "40px",
-        transform: "translate3d(0px, 15px, -70px)",
-      }}>
-        {/* Table Top */}
+      {/* 6. CORNER TECH MONITOR */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 15px, -70px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 15px, -70px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.75 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "60px", height: "35px",
+          marginLeft: "35px", marginTop: "40px"
+        }}
+      >
+        <div style={{ position: "absolute", width: "55px", height: "4px", background: "#1E1E1E", borderRadius: "2px", boxShadow: "0 2px 4px rgba(0,0,0,0.3)" }} />
         <div style={{
-          position: "absolute", width: "55px", height: "4px",
-          background: "#1E1E1E",
-          borderRadius: "2px",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
-        }} />
-        {/* Curved dual monitors with glowing curves */}
-        <div style={{
-          position: "absolute", left: "6px", top: "-18px",
+          position: "absolute",
+          left: "6px", top: "-18px",
           width: "42px", height: "18px",
           background: "#050505",
           border: "1px solid rgba(255,255,255,0.15)",
           borderRadius: "3px",
           boxShadow: "0 0 12px 2px rgba(0,255,102,0.45)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          overflow: "hidden",
-          transform: "rotateY(-10deg)",
+          display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+          transform: "rotateY(-10deg)"
         }}>
-          {/* Animated stock glow charts */}
-          <motion.div
-            animate={{ scaleY: [0.8, 1.2, 0.8] }}
-            transition={{ repeat: Infinity, duration: 2.5 }}
-            style={{
-              width: "36px", height: "10px",
-              borderBottom: "1.5px solid #00FF66",
-              borderRadius: "0 0 2px 2px",
-            }}
-          />
+          <motion.div animate={{ scaleY: [0.8, 1.2, 0.8] }} transition={{ repeat: Infinity, duration: 2.5 }} style={{ width: "36px", height: "10px", borderBottom: "1.5px solid #00FF66", borderRadius: "0 0 2px 2px" }} />
         </div>
-      </div>
+      </motion.div>
 
-      {/* Corporate Green Planter Wall */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "15px", height: "70px",
-        marginLeft: "-98px", marginTop: "-30px",
-        transform: "translate3d(0px, 10px, 35px)",
-      }}>
-        {/* Vertical Planter slats */}
+      {/* 7. VERTICAL PLANTER */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 10px, 35px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 10px, 35px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.85 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "15px", height: "70px",
+          marginLeft: "-98px", marginTop: "-30px"
+        }}
+      >
         <div style={{
           position: "absolute", inset: 0,
-          background: "#4E342E",
-          border: "1px solid rgba(0,0,0,0.2)",
-          borderRadius: "2px",
-          display: "flex", flexDirection: "column", justifyContent: "space-around", alignItems: "center", padding: "4px 0",
+          background: "#4E342E", border: "1px solid rgba(0,0,0,0.2)", borderRadius: "2px",
+          display: "flex", flexDirection: "column", justifyAround: "space-around", alignItems: "center",
+          padding: "4px 0"
         }}>
-          {[1, 2, 3, 4].map((pi) => (
-            <div key={pi} style={{
-              width: "10px", height: "10px",
-              background: "#2E7D32",
-              boxShadow: "0 0 6px #1B5E20",
-              borderRadius: "50%",
-            }} />
+          {[1, 2, 3, 4].map((v) => (
+            <div key={v} style={{ width: "10px", height: "10px", background: "#2E7D32", boxShadow: "0 0 6px #1B5E20", borderRadius: "50%" }} />
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
 
 function Design3D({ t }) {
+  const dropSpring = { type: "spring", stiffness: 100, damping: 15 };
+  const popSpring = { type: "spring", stiffness: 140, damping: 12 };
+
   return (
     <div style={{ transformStyle: "preserve-3d", width: "200px", height: "180px", position: "relative" }}>
-      {/* 1. FLOOR (Terrazzo Tile) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "160px",
-        marginLeft: "-100px", marginTop: "-80px",
-        background: "#F5EFE6",
-        border: `1.5px solid ${t.border}`,
-        boxShadow: `0 0 35px ${t.shadow}`,
-        transform: "translate3d(0px, 90px, 0px) rotateX(90deg)",
-        transformStyle: "preserve-3d",
-      }}>
-        {/* Faint grid flecks */}
+      {/* 1. FLOOR PLATE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 180px, 0px) rotateX(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 90px, 0px) rotateX(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.15 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "160px",
+          marginLeft: "-100px", marginTop: "-80px",
+          background: "#F5EFE6",
+          border: `1.5px solid ${t.border}`,
+          boxShadow: `0 0 35px ${t.shadow}`,
+          transformStyle: "preserve-3d"
+        }}
+      >
+        <div style={{ position: "absolute", inset: 0, backgroundImage: `radial-gradient(${t.gold}30 1px, transparent 1px)`, backgroundSize: "8px 8px" }} />
+
+        {/* 3D SIDE WALLS FOR WOOD BLOCK THICKNESS */}
         <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: `radial-gradient(${t.gold}30 1px, transparent 1px)`,
-          backgroundSize: "8px 8px",
+          position: "absolute", left: 0, top: "160px", width: "200px", height: "16px",
+          background: "linear-gradient(to bottom, #D7CCC8, #A1887F)",
+          transform: "rotateX(-90deg)", transformOrigin: "top center"
         }} />
-      </div>
-
-      {/* 2. CEILING (Industrial spot bars) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "160px",
-        marginLeft: "-100px", marginTop: "-80px",
-        background: "#333",
-        border: `1px solid ${t.border}`,
-        transform: "translate3d(0px, -90px, 0px) rotateX(90deg)",
-        transformStyle: "preserve-3d",
-      }} />
-
-      {/* 3. BACK WALL (Split kitchen & blueprints navy grid) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "200px", height: "180px",
-        marginLeft: "-100px", marginTop: "-90px",
-        border: `1.5px solid ${t.border}`,
-        transform: "translate3d(0px, 0px, -80px)",
-        transformStyle: "preserve-3d",
-      }}>
-        {/* Left Side: Modular Kitchen white tiled backsplash */}
         <div style={{
-          position: "absolute", left: 0, top: 0, bottom: 0,
-          width: "100px",
-          background: `repeating-linear-gradient(0deg, transparent, transparent 11px, ${t.border} 11px, ${t.border} 12px), repeating-linear-gradient(90deg, #F8FAFC, #F8FAFC 24px, ${t.border} 24px, ${t.border} 25px)`,
+          position: "absolute", left: 0, top: 0, width: "200px", height: "16px",
+          background: "linear-gradient(to bottom, #EFEBE9, #BCAAA4)",
+          transform: "rotateX(90deg)", transformOrigin: "top center"
         }} />
-
-        {/* Right Side: Architectural Blueprint Navy Grid */}
         <div style={{
-          position: "absolute", right: 0, top: 0, bottom: 0,
-          width: "100px",
+          position: "absolute", left: 0, top: 0, width: "16px", height: "160px",
+          background: "linear-gradient(to bottom, #D7CCC8, #A1887F)",
+          transform: "rotateY(-90deg)", transformOrigin: "left center"
+        }} />
+        <div style={{
+          position: "absolute", left: "200px", top: 0, width: "16px", height: "160px",
+          background: "linear-gradient(to bottom, #EFEBE9, #BCAAA4)",
+          transform: "rotateY(90deg)", transformOrigin: "left center"
+        }} />
+      </motion.div>
+
+      {/* 2. CEILING PLATE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, -180px, 0px) rotateX(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, -90px, 0px) rotateX(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 1.15 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "160px",
+          marginLeft: "-100px", marginTop: "-80px",
+          background: "#333",
+          border: `1px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      />
+
+      {/* 3. BACK WALL */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 0px, -160px)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 0px, -80px)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.35 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "180px",
+          marginLeft: "-100px", marginTop: "-90px",
+          border: `1.5px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      >
+        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "100px", background: `repeating-linear-gradient(0deg, transparent, transparent 11px, ${t.border} 11px, ${t.border} 12px), repeating-linear-gradient(90deg, #F8FAFC, #F8FAFC 24px, ${t.border} 24px, ${t.border} 25px)` }} />
+        <div style={{
+          position: "absolute", right: 0, top: 0, bottom: 0, width: "100px",
           background: "#0D1E36",
           backgroundImage: `
             linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
             linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)
           `,
-          backgroundSize: "20px 20px",
-          padding: "10px",
+          backgroundSize: "20px 20px", padding: "10px"
         }}>
-          {/* Blueprint Drafting Coordinates */}
-          <div style={{
-            width: "36px", height: "36px",
-            border: "1px dashed rgba(255, 255, 255, 0.25)",
-            borderRadius: "50%",
-            marginTop: "20px",
-            marginLeft: "20px",
-            position: "relative",
-          }}>
+          <div style={{ width: "36px", height: "36px", border: "1px dashed rgba(255, 255, 255, 0.25)", borderRadius: "50%", marginTop: "20px", marginLeft: "20px", position: "relative" }}>
             <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: "1px", background: "rgba(255,255,255,0.15)" }} />
             <div style={{ position: "absolute", top: "50%", left: 0, right: 0, height: "1px", background: "rgba(255,255,255,0.15)" }} />
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* 4. LEFT WALL (Terracotta clay plaster) */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "160px", height: "180px",
-        marginLeft: "-80px", marginTop: "-90px",
-        background: t.isDark ? "#8C2D11" : "#C65A31",
-        border: `1.5px solid ${t.border}`,
-        transform: "translate3d(-100px, 0px, 0px) rotateY(90deg)",
-        transformStyle: "preserve-3d",
-      }} />
+      {/* 4. LEFT WALL */}
+      <motion.div
+        initial={{ transform: "translate3d(-180px, 0px, 0px) rotateY(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(-100px, 0px, 0px) rotateY(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.45 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "160px", height: "180px",
+          marginLeft: "-80px", marginTop: "-90px",
+          background: t.isDark ? "#8C2D11" : "#C65A31",
+          border: `1.5px solid ${t.border}`,
+          transformStyle: "preserve-3d"
+        }}
+      />
 
-      {/* ── MODULAR KITCHEN AREA (Left) ── */}
-      {/* Kitchen Island Counter */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "60px", height: "30px",
-        marginLeft: "-80px", marginTop: "35px",
-        transform: "translate3d(0px, 20px, -10px)",
-      }}>
-        {/* Marble Top */}
-        <div style={{
-          position: "absolute", width: "55px", height: "4px",
-          background: "#FFF",
-          border: "1px solid rgba(0,0,0,0.15)",
-          borderRadius: "2px",
-          boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
-        }}>
-          {/* Marble vein */}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(60deg, transparent 40%, rgba(0,0,0,0.06) 42%, transparent 45%)" }} />
-        </div>
-        {/* Charcoal Island Cabinets */}
-        <div style={{
-          position: "absolute", width: "53px", height: "24px",
-          background: "#1E293B",
-          borderRadius: "2px",
-          transform: "translate3d(1px, 4px, -10px)",
-          display: "flex", justifyContent: "space-around", alignItems: "center",
-        }}>
-          {/* Gold handles */}
-          <div style={{ width: "8px", height: "2px", background: t.gold }} />
-          <div style={{ width: "8px", height: "2px", background: t.gold }} />
-        </div>
-      </div>
-
-      {/* Two High Bar Stools */}
-      {[
-        { x: -50, z: 25 }, { x: -28, z: 25 }
-      ].map((st, idx) => (
-        <div key={idx} style={{
+      {/* 5. KITCHEN ISLAND */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 20px, -10px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 20px, -10px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.6 }}
+        style={{
           transformStyle: "preserve-3d",
           position: "absolute",
           left: "50%", top: "50%",
-          width: "16px", height: "25px",
-          marginLeft: `${st.x}px`, marginTop: "65px",
-          transform: `translate3d(0px, 0px, ${st.z}px)`,
-        }}>
-          {/* Stool Seat */}
+          width: "60px", height: "30px",
+          marginLeft: "-80px", marginTop: "35px"
+        }}
+      >
+        <div style={{ position: "absolute", width: "55px", height: "4px", background: "#FFF", border: "1px solid rgba(0,0,0,0.15)", borderRadius: "2px", boxShadow: "0 4px 8px rgba(0,0,0,0.25)" }}>
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(60deg, transparent 40%, rgba(0,0,0,0.06) 42%, transparent 45%)" }} />
+        </div>
+        <div style={{ position: "absolute", width: "53px", height: "24px", background: "#1E293B", borderRadius: "2px", transform: "translate3d(1px, 4px, -10px)", display: "flex", justifyAround: "space-around", alignItems: "center" }}>
+          <div style={{ width: "8px", height: "2px", background: t.gold }} />
+          <div style={{ width: "8px", height: "2px", background: t.gold }} />
+        </div>
+      </motion.div>
+
+      {/* 6. BAR STOOLS */}
+      {[{ x: -50, z: 25 }, { x: -28, z: 25 }].map((pos, i) => (
+        <motion.div
+          key={i}
+          initial={{ transform: `translate3d(0px, 0px, ${pos.z}px) scale(0)`, opacity: 0 }}
+          animate={{ transform: `translate3d(0px, 0px, ${pos.z}px) scale(1)`, opacity: 1 }}
+          transition={{ ...popSpring, delay: 0.65 + i * 0.08 }}
+          style={{
+            transformStyle: "preserve-3d",
+            position: "absolute",
+            left: "50%", top: "50%",
+            width: "16px", height: "25px",
+            marginLeft: `${pos.x}px`, marginTop: "65px"
+          }}
+        >
           <div style={{ width: "12px", height: "2px", background: "#111", borderRadius: "50%" }} />
-          {/* Stool Gold Legs */}
           <div style={{ position: "absolute", width: "1.5px", height: "24px", background: t.gold, transform: "translate3d(2px, 2px, 0px) rotateZ(6deg)" }} />
           <div style={{ position: "absolute", width: "1.5px", height: "24px", background: t.gold, transform: "translate3d(8px, 2px, 0px) rotateZ(-6deg)" }} />
-        </div>
+        </motion.div>
       ))}
 
-      {/* Floating Overhead Kitchen Cabinets with orange LED wash */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "70px", height: "25px",
-        marginLeft: "-98px", marginTop: "-60px",
-        transform: "translate3d(0px, 0px, -78px)",
-      }}>
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "#4A3B32",
-          border: "1px solid rgba(0,0,0,0.2)",
-          borderRadius: "2px",
-          boxShadow: `0 4px 12px rgba(254,165,0,0.55)`,
-        }} />
-      </div>
+      {/* 7. OVERHEAD CABINETS */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 0px, -78px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 0px, -78px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.7 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "70px", height: "25px",
+          marginLeft: "-98px", marginTop: "-60px"
+        }}
+      >
+        <div style={{ position: "absolute", inset: 0, background: "#4A3B32", border: "1px solid rgba(0,0,0,0.2)", borderRadius: "2px", boxShadow: "0 4px 12px rgba(254,165,0,0.55)" }} />
+      </motion.div>
 
-      {/* ── ARCHITECT'S STUDIO AREA (Right) ── */}
-      {/* Tilted Drafting Table */}
-      <div style={{
-        transformStyle: "preserve-3d",
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "60px", height: "35px",
-        marginLeft: "25px", marginTop: "35px",
-        transform: "translate3d(0px, 20px, -10px) rotateX(-18deg)",
-      }}>
-        {/* Drawing Board Wood */}
+      {/* 8. ARCHITECT DRAFTING TABLE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 20px, -10px) rotateX(-18deg) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 20px, -10px) rotateX(-18deg) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.8 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "60px", height: "35px",
+          marginLeft: "25px", marginTop: "35px"
+        }}
+      >
         <div style={{
           position: "absolute", width: "55px", height: "38px",
-          background: "#D4AF37",
-          border: "1.5px solid #8B6508",
-          borderRadius: "3px",
+          background: "#D4AF37", border: "1.5px solid #8B6508", borderRadius: "3px",
           boxShadow: "0 6px 12px rgba(0,0,0,0.3)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          padding: "3px",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: "3px"
         }}>
-          {/* Blueprint Layout Paper on desk */}
           <div style={{
-            width: "100%", height: "100%",
-            background: "#0091EA",
-            border: "1px solid rgba(255,255,255,0.4)",
+            width: "100%", height: "100%", background: "#0091EA", border: "1px solid rgba(255,255,255,0.4)",
             backgroundImage: `
               linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px),
               linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)
             `,
-            backgroundSize: "6px 6px",
-            position: "relative",
+            backgroundSize: "6px 6px", position: "relative"
           }}>
-            {/* White house outline sketch */}
-            <div style={{
-              position: "absolute", left: "6px", top: "6px",
-              width: "32px", height: "20px",
-              border: "1px solid #FFF",
-            }}>
+            <div style={{ position: "absolute", left: "6px", top: "6px", width: "32px", height: "20px", border: "1px solid #FFF" }}>
               <div style={{ position: "absolute", top: "-6px", left: "-1px", right: "-1px", height: "6px", border: "1px solid #FFF", borderBottom: "none", clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)" }} />
             </div>
           </div>
         </div>
+        <div style={{ transformStyle: "preserve-3d", position: "absolute", left: "40px", top: "-18px", width: "12px", height: "20px", transform: "translate3d(0px, 0px, -10px)" }}>
+          <div style={{ position: "absolute", width: "10px", height: "8px", background: "#FBC02D", borderRadius: "4px 4px 1px 1px", boxShadow: "0 0 14px 4px rgba(251,192,45,0.6)" }} />
+        </div>
+      </motion.div>
 
-        {/* Architect Yellow Angle-poise Lamp */}
+      {/* 9. FLOATING COMPASS CIRCLE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 0px, -5px) rotateX(90deg) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 0px, -5px) rotateX(90deg) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.9 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "100px", height: "100px",
+          marginLeft: "5px", marginTop: "-30px",
+          border: `1.5px dashed ${t.terraLight}`,
+          borderRadius: "50%",
+          opacity: 0.8,
+          pointerEvents: "none"
+        }}
+      />
+    </div>
+  );
+}
+
+function Agriculture3D({ t }) {
+  const dropSpring = { type: "spring", stiffness: 100, damping: 15 };
+  const popSpring = { type: "spring", stiffness: 140, damping: 12 };
+
+  // 12-second loop for the tractor path
+  const tractorX = [-65, 65, 65, 65, -65, -65, -65];
+  const tractorRotY = [90, 90, 180, 270, 270, 360, 450];
+  const tractorTimes = [0, 0.4, 0.45, 0.5, 0.9, 0.95, 1.0];
+
+  return (
+    <div style={{ transformStyle: "preserve-3d", width: "200px", height: "220px", position: "relative" }}>
+      {/* 1. FIELD BASE PLATE (Plowed rows & Dirt track & 3D thickness) */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 200px, 0px) rotateX(90deg)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 100px, 0px) rotateX(90deg)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.15 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "200px", height: "160px",
+          marginLeft: "-100px", marginTop: "-80px",
+          background: `repeating-linear-gradient(90deg, #5D4037 0px, #5D4037 14px, #388E3C 14px, #388E3C 28px)`,
+          border: `1px solid ${t.border}`,
+          transformStyle: "preserve-3d",
+        }}
+      >
+        {/* Dirt road path for the tractor (centered around Z: 20px) */}
         <div style={{
+          position: "absolute",
+          left: 0,
+          top: "85px",
+          width: "200px",
+          height: "30px",
+          background: "#8D6E63",
+          borderTop: "1.5px dashed #5D4037",
+          borderBottom: "1.5px dashed #5D4037",
+          opacity: 0.85,
+        }} />
+
+        {/* Tiny green crop dots aligned in rows */}
+        {[...Array(6)].map((_, i) => (
+          <div key={i} style={{
+            position: "absolute",
+            left: `${20 + i * 28}px`,
+            top: "10px",
+            width: "6px", height: "65px",
+            background: "rgba(76, 175, 80, 0.35)",
+            borderRadius: "3px"
+          }} />
+        ))}
+
+        {/* 3D SIDE WALLS FOR 16PX THICKNESS */}
+        <div style={{
+          position: "absolute", left: 0, top: "160px", width: "200px", height: "16px",
+          background: "linear-gradient(to bottom, #4E342E, #2E1C0C)",
+          transform: "rotateX(-90deg)", transformOrigin: "top center"
+        }} />
+        <div style={{
+          position: "absolute", left: 0, top: 0, width: "200px", height: "16px",
+          background: "linear-gradient(to bottom, #3E2723, #1A0E07)",
+          transform: "rotateX(90deg)", transformOrigin: "top center"
+        }} />
+        <div style={{
+          position: "absolute", left: 0, top: 0, width: "16px", height: "160px",
+          background: "linear-gradient(to bottom, #4E342E, #2E1C0C)",
+          transform: "rotateY(-90deg)", transformOrigin: "left center"
+        }} />
+        <div style={{
+          position: "absolute", left: "200px", top: 0, width: "16px", height: "160px",
+          background: "linear-gradient(to bottom, #3E2723, #1A0E07)",
+          transform: "rotateY(90deg)", transformOrigin: "left center"
+        }} />
+      </motion.div>
+
+      {/* 2. GREENHOUSE / POLYHOUSE */}
+      <motion.div
+        initial={{ transform: "translate3d(0px, 55px, -25px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(0px, 55px, -25px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.5 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "60px", height: "45px",
+          marginLeft: "-30px", marginTop: "-22.5px",
+          background: "rgba(179, 229, 252, 0.35)",
+          border: "1.5px solid rgba(2, 136, 209, 0.6)",
+          borderRadius: "30px 30px 0 0",
+          transformStyle: "preserve-3d",
+          boxShadow: "0 0 15px rgba(2, 136, 209, 0.2)",
+        }}
+      >
+        <div style={{ position: "absolute", left: "18px", top: 0, bottom: 0, width: "1.5px", background: "rgba(2, 136, 209, 0.6)" }} />
+        <div style={{ position: "absolute", left: "40px", top: 0, bottom: 0, width: "1.5px", background: "rgba(2, 136, 209, 0.6)" }} />
+      </motion.div>
+
+      {/* 3. WINDMILL / TURBINE */}
+      <motion.div
+        initial={{ transform: "translate3d(60px, 0px, -55px) scaleY(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(60px, 0px, -55px) scaleY(1)", opacity: 1 }}
+        transition={{ ...dropSpring, delay: 0.7 }}
+        style={{
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "6px", height: "110px",
+          marginLeft: "-3px", marginTop: "-10px",
+          background: "linear-gradient(to bottom, #FFFFFF, #B0BEC5)",
+          transformStyle: "preserve-3d",
+          transformOrigin: "bottom center"
+        }}
+      >
+        <div style={{ position: "absolute", inset: "0 1px", background: "repeating-linear-gradient(180deg, transparent, transparent 15px, rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 16px)" }} />
+        <div style={{ position: "absolute", bottom: 0, left: "-8px", width: "22px", height: "10px", background: "#37474F", borderRadius: "4px 4px 0 0" }} />
+
+        {/* Blinking beacon */}
+        <motion.div
+          animate={{ opacity: [1, 0.3, 1] }}
+          transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+          style={{ position: "absolute", top: "-15px", left: "1px", width: "4px", height: "4px", borderRadius: "50%", background: "#FF1744", boxShadow: "0 0 8px #FF1744", zIndex: 20 }}
+        />
+
+        {/* 3D Nacelle Box */}
+        <div style={{
+          position: "absolute",
+          top: "-10px", left: "50%",
+          width: "12px", height: "10px",
+          marginLeft: "-6px",
+          background: "#FFFFFF",
+          border: `1px solid ${t.border}`,
+          borderRadius: "2px",
+          transformStyle: "preserve-3d",
+          transform: "translate3d(0, 0, -4px)",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.15)"
+        }}>
+          <div style={{ position: "absolute", inset: 0, background: "#FFFFFF", transform: "translateZ(8px)", border: `1px solid ${t.border}`, borderRadius: "1px" }} />
+        </div>
+
+        {/* Blades offset forward */}
+        <div style={{
+          position: "absolute",
+          top: "-15px",
+          left: "50%",
+          width: "40px",
+          height: "40px",
+          marginLeft: "-20px",
+          transformStyle: "preserve-3d",
+          transform: "translate3d(0, 0, 12px)"
+        }}>
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 5, ease: "linear" }}
+            style={{ width: "100%", height: "100%", position: "relative", transformStyle: "preserve-3d", display: "flex", alignItems: "center", justifyContent: "center" }}
+          >
+            <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#ECEFF1", zIndex: 10, boxShadow: "0 2px 4px rgba(0,0,0,0.2)" }} />
+            <div style={{ position: "absolute", bottom: "50%", left: "18px", width: "4px", height: "45px", background: "#FFFFFF", border: "1.5px solid #CFD8DC", borderRadius: "2px", transformOrigin: "bottom center" }} />
+            <div style={{ position: "absolute", top: "50%", left: "18px", width: "4px", height: "45px", background: "#FFFFFF", border: "1.5px solid #CFD8DC", borderRadius: "2px", transformOrigin: "top center", transform: "rotate(120deg)" }} />
+            <div style={{ position: "absolute", top: "50%", left: "18px", width: "4px", height: "45px", background: "#FFFFFF", border: "1.5px solid #CFD8DC", borderRadius: "2px", transformOrigin: "top center", transform: "rotate(240deg)" }} />
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* 4. 3D FARM HUT */}
+      <motion.div
+        initial={{ transform: "translate3d(-60px, 72px, -30px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(-60px, 72px, -30px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.6 }}
+        style={{
           transformStyle: "preserve-3d",
           position: "absolute",
-          left: "40px", top: "-18px",
-          width: "12px", height: "20px",
-          transform: "translate3d(0px, 0px, -10px)",
-        }}>
-          {/* Yellow Lamp shade */}
-          <div style={{
-            position: "absolute", width: "10px", height: "8px",
-            background: "#FBC02D",
-            borderRadius: "4px 4px 1px 1px",
-            boxShadow: "0 0 14px 4px rgba(251,192,45,0.6)",
-          }} />
+          left: "50%", top: "50%",
+          width: "36px", height: "35px",
+          marginLeft: "-18px", marginTop: "-17.5px"
+        }}
+      >
+        <div style={{ position: "absolute", inset: 0, width: "36px", height: "20px", background: "#8B5A2B", border: "1.5px solid #5C3A21", transform: "translate3d(0px, 15px, 15px)", transformStyle: "preserve-3d" }}>
+          <div style={{ position: "absolute", bottom: 0, left: "12px", width: "12px", height: "14px", background: "#3E2723", border: "1px solid #111" }} />
         </div>
-      </div>
+        <div style={{ position: "absolute", inset: 0, width: "36px", height: "20px", background: "#8B5A2B", border: "1.5px solid #5C3A21", transform: "translate3d(0px, 15px, -15px) rotateY(180deg)" }} />
+        <div style={{ position: "absolute", inset: 0, width: "30px", height: "20px", background: "#704214", border: "1.5px solid #5C3A21", transform: "translate3d(-18px, 15px, 0px) rotateY(-90deg)", transformStyle: "preserve-3d" }}>
+          <div style={{ position: "absolute", top: "4px", left: "10px", width: "10px", height: "8px", background: "#FFF9C4", border: "1px solid #FBC02D", boxShadow: "0 0 8px #FFF9C4" }} />
+        </div>
+        <div style={{ position: "absolute", inset: 0, width: "30px", height: "20px", background: "#704214", border: "1.5px solid #5C3A21", transform: "translate3d(18px, 15px, 0px) rotateY(90deg)" }} />
+        <div style={{ position: "absolute", width: "40px", height: "22px", background: "#E6C229", border: "1px solid #C49A13", left: "-2px", top: "0px", transformOrigin: "bottom center", transform: "translate3d(0px, 3px, 8px) rotateX(38deg)" }} />
+        <div style={{ position: "absolute", width: "40px", height: "22px", background: "#E6C229", border: "1px solid #C49A13", left: "-2px", top: "0px", transformOrigin: "bottom center", transform: "translate3d(0px, 3px, -8px) rotateX(-38deg)" }} />
+      </motion.div>
 
-      {/* Floating Holographic Compass Guideline Circle */}
-      <div style={{
-        position: "absolute",
-        left: "50%", top: "50%",
-        width: "100px", height: "100px",
-        marginLeft: "5px", marginTop: "-30px",
-        border: `1.5px dashed ${t.terraLight}`,
-        borderRadius: "50%",
-        transform: "translate3d(0px, 0px, -5px) rotateX(90deg)",
-        opacity: 0.8,
-        pointerEvents: "none",
-      }} />
+      {/* 5. WATER SPRINKLER SYSTEM */}
+      <motion.div
+        initial={{ transform: "translate3d(15px, 78px, 50px) scale(0)", opacity: 0 }}
+        animate={{ transform: "translate3d(15px, 78px, 50px) scale(1)", opacity: 1 }}
+        transition={{ ...popSpring, delay: 0.9 }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "12px", height: "22px",
+          marginLeft: "-6px", marginTop: "-11px"
+        }}
+      >
+        <div style={{ position: "absolute", bottom: 0, left: "5px", width: "2px", height: "18px", background: "#B0BEC5" }} />
+        <div style={{ position: "absolute", top: "0px", left: "3px", width: "6px", height: "4px", borderRadius: "2px", background: "#37474F", transformStyle: "preserve-3d" }}>
+          {[0, 72, 144, 216, 288].map((angle, j) => (
+            <motion.div
+              key={j}
+              animate={{
+                x: [0, Math.cos(angle * Math.PI / 180) * 32],
+                y: [0, Math.sin(angle * Math.PI / 180) * 14 - 15],
+                opacity: [1, 0.8, 0],
+                scale: [0.6, 1.3, 0.4]
+              }}
+              transition={{ repeat: Infinity, duration: 1.4, delay: j * 0.28, ease: "easeOut" }}
+              style={{
+                position: "absolute",
+                left: "1px", top: "-2px",
+                width: "3px", height: "3px",
+                borderRadius: "50%",
+                background: "#00E5FF",
+                boxShadow: "0 0 6px #00E5FF"
+              }}
+            />
+          ))}
+        </div>
+      </motion.div>
+
+      {/* 6. BIG ANIMATED TRACTOR */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          x: tractorX,
+          z: [20, 20, 20, 20, 20, 20, 20],
+          rotateY: tractorRotY,
+          y: [62, 60.5, 62, 61, 62]
+        }}
+        transition={{
+          x: { repeat: Infinity, duration: 12, ease: "linear", times: tractorTimes },
+          rotateY: { repeat: Infinity, duration: 12, ease: "linear", times: tractorTimes },
+          z: { repeat: Infinity, duration: 12, ease: "linear", times: tractorTimes },
+          y: { repeat: Infinity, duration: 0.4, ease: "easeInOut" },
+          scale: popSpring,
+          opacity: popSpring
+        }}
+        style={{
+          transformStyle: "preserve-3d",
+          position: "absolute",
+          left: "50%", top: "50%",
+          width: "50px", height: "38px",
+          marginLeft: "-25px", marginTop: "-19px"
+        }}
+      >
+        <div style={{ position: "absolute", left: "8px", bottom: "8px", width: "24px", height: "14px", background: "#D32F2F", border: "1px solid #991B1B", borderRadius: "2px", transform: "translateZ(0px)", transformStyle: "preserve-3d" }} />
+        <div style={{ position: "absolute", left: "32px", bottom: "10px", width: "14px", height: "10px", background: "#E53935", border: "1px solid #991B1B", borderRadius: "2px 0 0 2px", transform: "translateZ(0px)" }} />
+        <div style={{ position: "absolute", left: "8px", bottom: "22px", width: "16px", height: "14px", background: "rgba(33, 33, 33, 0.85)", border: "1.5px solid #111", borderRadius: "3px 3px 0 0", display: "flex", alignItems: "center", justifyCenter: "center" }}>
+          <div style={{ width: "10px", height: "8px", background: "rgba(255, 235, 59, 0.3)", border: "1px solid rgba(255, 235, 59, 0.5)", borderRadius: "1px" }} />
+        </div>
+        <div style={{ position: "absolute", left: "36px", bottom: "24px", width: "3px", height: "16px", background: "#212121", transform: "translateZ(0px)" }}>
+          {[0, 0.6, 1.2].map((delayTime, idx) => (
+            <motion.div
+              key={idx}
+              animate={{ y: [-4, -30], x: [0, 6], scale: [0.5, 2.2], opacity: [0.8, 0] }}
+              transition={{ repeat: Infinity, duration: 1.8, delay: delayTime, ease: "easeOut" }}
+              style={{
+                position: "absolute",
+                top: "-4px", left: "-3px",
+                width: "8px", height: "8px",
+                borderRadius: "50%",
+                background: t.isDark ? "rgba(255,255,255,0.4)" : "rgba(100,100,100,0.25)",
+                filter: "blur(0.8px)"
+              }}
+            />
+          ))}
+        </div>
+        <div style={{ position: "absolute", left: "32px", bottom: "0px", width: "12px", height: "12px", transform: "rotateY(90deg) translateZ(11px)", transformStyle: "preserve-3d" }}>
+          <motion.div animate={{ rotate: [0, 360] }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }} style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#212121", border: "1.5px solid #424242", backgroundImage: "conic-gradient(#212121 0% 25%, #424242 25% 50%, #212121 50% 75%, #424242 75% 100%)" }} />
+        </div>
+        <div style={{ position: "absolute", left: "32px", bottom: "0px", width: "12px", height: "12px", transform: "rotateY(90deg) translateZ(-11px)", transformStyle: "preserve-3d" }}>
+          <motion.div animate={{ rotate: [0, 360] }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }} style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#212121", border: "1.5px solid #424242", backgroundImage: "conic-gradient(#212121 0% 25%, #424242 25% 50%, #212121 50% 75%, #424242 75% 100%)" }} />
+        </div>
+        <div style={{ position: "absolute", left: "6px", bottom: "0px", width: "20px", height: "20px", transform: "rotateY(90deg) translateZ(12px)", transformStyle: "preserve-3d" }}>
+          <motion.div animate={{ rotate: [0, 360] }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }} style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#111", border: "2.5px solid #37474F", backgroundImage: "conic-gradient(#111 0% 25%, #37474F 25% 50%, #111 50% 75%, #37474F 75% 100%)" }} />
+        </div>
+        <div style={{ position: "absolute", left: "6px", bottom: "0px", width: "20px", height: "20px", transform: "rotateY(90deg) translateZ(-12px)", transformStyle: "preserve-3d" }}>
+          <motion.div animate={{ rotate: [0, 360] }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }} style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#111", border: "2.5px solid #37474F", backgroundImage: "conic-gradient(#111 0% 25%, #37474F 25% 50%, #111 50% 75%, #37474F 75% 100%)" }} />
+        </div>
+      </motion.div>
+
+      {/* 7. SWAYING CROPS */}
+      {[{ x: -10, z: 40, col: "#F4D08B" }, { x: 30, z: -30, col: "#CCA05A" }, { x: 50, z: 20, col: "#F4D08B" }, { x: -45, z: 20, col: "#CCA05A" }].map((crop, i) => (
+        <motion.div
+          key={i}
+          initial={{ transform: `translate3d(0px, 0px, ${crop.z}px) rotateY(${i * 45}deg) scale(0)`, opacity: 0 }}
+          animate={{ transform: `translate3d(0px, 0px, ${crop.z}px) rotateY(${i * 45}deg) scale(1)`, opacity: 1 }}
+          transition={{ ...popSpring, delay: 0.8 + i * 0.08 }}
+          style={{ position: "absolute", left: "50%", top: "50%", width: "8px", height: "16px", transformStyle: "preserve-3d", marginLeft: `${crop.x}px`, marginTop: "88px" }}
+        >
+          <motion.div
+            animate={{ rotateZ: [-4, 4, -4] }}
+            transition={{ repeat: Infinity, duration: 2 + i * 0.4, ease: "easeInOut" }}
+            style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", transformOrigin: "bottom center" }}
+          >
+            <div style={{ width: "5px", height: "6px", background: crop.col, borderRadius: "50% 50% 0 0", boxShadow: `0 0 6px ${crop.col}88` }} />
+            <div style={{ width: "1.5px", height: "10px", background: "#4CAF50" }} />
+          </motion.div>
+        </motion.div>
+      ))}
+
+      {/* 8. 3D TREES */}
+      {[{ x: -82, z: -60, delay: 0.95 }, { x: -76, z: 50, delay: 1.15 }, { x: 78, z: 45, delay: 1.3 }, { x: 32, z: -62, delay: 1.45 }].map((tree, i) => (
+        <motion.div
+          key={i}
+          initial={{ transform: `translate3d(${tree.x}px, 62px, ${tree.z}px) scale(0)`, opacity: 0 }}
+          animate={{ transform: `translate3d(${tree.x}px, 62px, ${tree.z}px) scale(1)`, opacity: 1 }}
+          transition={{ ...popSpring, delay: tree.delay }}
+          style={{ transformStyle: "preserve-3d", position: "absolute", left: "50%", top: "50%", width: "20px", height: "55px", marginLeft: "-10px", marginTop: "-27.5px" }}
+        >
+          {/* Tree Trunk */}
+          <div style={{
+            position: "absolute", bottom: 0, left: "8px", width: "4px", height: "20px",
+            background: "#5D4037", border: "1px solid #3E2723",
+            transformStyle: "preserve-3d"
+          }} />
+
+          {/* Bottom Foliage Layer */}
+          <div style={{
+            position: "absolute", bottom: "16px", left: "1px", width: "18px", height: "18px",
+            background: "#2E7D32", border: "1.5px solid #1B5E20", borderRadius: "50%",
+            transform: "translate3d(0, 0, 0)", boxShadow: "0 4px 8px rgba(0,0,0,0.3)"
+          }} />
+          <div style={{
+            position: "absolute", bottom: "16px", left: "1px", width: "18px", height: "18px",
+            background: "#2E7D32", border: "1.5px solid #1B5E20", borderRadius: "50%",
+            transform: "rotateY(90deg)"
+          }} />
+
+          {/* Top Foliage Layer */}
+          <div style={{
+            position: "absolute", bottom: "28px", left: "4px", width: "12px", height: "12px",
+            background: "#4CAF50", border: "1.2px solid #2E7D32", borderRadius: "50%",
+            transform: "translate3d(0, 0, 0)", boxShadow: "0 2px 6px rgba(0,0,0,0.25)"
+          }} />
+          <div style={{
+            position: "absolute", bottom: "28px", left: "4px", width: "12px", height: "12px",
+            background: "#4CAF50", border: "1.2px solid #2E7D32", borderRadius: "50%",
+            transform: "rotateY(90deg)"
+          }} />
+        </motion.div>
+      ))}
     </div>
   );
 }
 
 function Showcase3D({ activeCategory, t }) {
   const containerRef = useRef(null);
-  const [tilt, setTilt] = useState({ rx: 15, ry: -25, active: false });
+  const [tilt, setTilt] = useState({ rx: 22, ry: -25, active: false }); // Steeper default tilt rx: 22
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
 
   useEffect(() => {
@@ -2306,16 +2947,15 @@ function Showcase3D({ activeCategory, t }) {
     const r = containerRef.current?.getBoundingClientRect();
     if (!r) return;
     const x = (e.clientX - r.left) / r.width;
-    const y = (e.clientY - r.top)  / r.height;
     setTilt({
-      rx: 8 + (1 - y) * 22,
+      rx: 12 + (1 - (e.clientY - r.top) / r.height) * 20, // steeper tilt dynamic range
       ry: -45 + x * 40,
       active: true
     });
   }, []);
 
   const onLeave = useCallback(() => {
-    setTilt({ rx: 15, ry: -25, active: false });
+    setTilt({ rx: 22, ry: -25, active: false }); // Steeper default reset rx: 22
   }, []);
 
   return (
@@ -2352,11 +2992,11 @@ function Showcase3D({ activeCategory, t }) {
         <motion.div
           animate={{
             rotateX: tilt.rx,
-            rotateY: tilt.active ? tilt.ry : [-25, 335],
+            rotateY: tilt.active ? tilt.ry : [-25, 25, -25],
           }}
           transition={tilt.active
             ? { type: "spring", stiffness: 220, damping: 24 }
-            : { repeat: Infinity, duration: 24, ease: "linear" }
+            : { repeat: Infinity, duration: 16, ease: "easeInOut" }
           }
           style={{
             transformStyle: "preserve-3d",
@@ -2379,6 +3019,11 @@ function Showcase3D({ activeCategory, t }) {
                 <Commercial3D t={t} />
               </motion.div>
             )}
+            {activeCategory === "agriculture" && (
+              <motion.div key="agri" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: modelScale }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.5 }} style={{ transformStyle: "preserve-3d" }}>
+                <Agriculture3D t={t} />
+              </motion.div>
+            )}
             {activeCategory === "design" && (
               <motion.div key="des" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: modelScale }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.5 }} style={{ transformStyle: "preserve-3d" }}>
                 <Design3D t={t} />
@@ -2388,12 +3033,7 @@ function Showcase3D({ activeCategory, t }) {
         </motion.div>
       </div>
 
-      <div style={{ position: "absolute", top: 14, left: 16, fontSize: "9px", fontFamily: "monospace", color: t.gold, opacity: 0.6, letterSpacing: "1px" }}>
-        RENDER MODE: REAL-TIME 3D CSS
-      </div>
-      <div style={{ position: "absolute", bottom: 14, right: 16, fontSize: "9px", fontFamily: "monospace", color: t.gold, opacity: 0.6, letterSpacing: "1px" }}>
-        PERSPECTIVE: 1200PX · ORBIT ACTIVE
-      </div>
+
     </div>
   );
 }
@@ -2579,7 +3219,7 @@ function ServiceModal({ svc, t, onClose }) {
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
               Enquire on WhatsApp
             </motion.a>
@@ -2617,8 +3257,9 @@ function Services({ t }) {
 
   const categories = useMemo(() => [
     { id: "residential", label: "Residential", Icon: Home },
-    { id: "commercial",  label: "Commercial",  Icon: Building2 },
-    { id: "design",      label: "Architecture & Design", Icon: LayoutTemplate }
+    { id: "commercial", label: "Commercial", Icon: Building2 },
+    { id: "agriculture", label: "Agriculture", Icon: Tractor },
+    { id: "design", label: "Construction & Design", Icon: LayoutTemplate }
   ], []);
 
   const filteredServices = useMemo(() => {
@@ -2717,7 +3358,7 @@ function Services({ t }) {
         {/* Two-Column Grid: SVG Blueprint board + Staggered Cards */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "40px" }}>
           <div className="ub-two-col" style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: "40px", alignItems: "start" }}>
-            
+
             {/* Left Column: Architectural Blueprint Canvas */}
             <FadeUp delay={0.3}>
               <Showcase3D activeCategory={activeCategory} t={t} />
@@ -2829,9 +3470,9 @@ function Contact({ t }) {
   const [status, setStatus] = useState({ type: "", message: "" });
 
   const contactItems = [
-    { Icon: Phone,     label: "Mobile",  value: "+91 9810864670",                   href: "tel:+919810864670" },
-    { Icon: Mail,      label: "Email",   value: "chandan.urbanbricks@gmail.com",    href: "mailto:chandan.urbanbricks@gmail.com" },
-    { Icon: Globe,     label: "Website", value: "urbanbricks.in",                   href: "https://urbanbricks.in" },
+    { Icon: Phone, label: "Mobile", value: "+91 9810864670", href: "tel:+919810864670" },
+    { Icon: Mail, label: "Email", value: "urbanbricks.in@gmail.com", href: "mailto:urbanbricks.in@gmail.com" },
+    { Icon: Globe, label: "Website", value: "urbanbricks.in", href: "https://urbanbricks.in" },
     { Icon: MapPinned, label: "Address", value: "1st Floor, Aashish Electricals, Beside Carmel School, Namnakala, Ambikapur, Surguja (C.G.) 497001", href: "#" },
   ];
 
@@ -2944,7 +3585,7 @@ Here are my details:
                   }}
                 >
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                   </svg>
                 </motion.a>
               </motion.div>
@@ -2961,6 +3602,122 @@ Here are my details:
                 t={t}
               />
             ))}
+
+            {/* Office Location — Google Maps Card */}
+            <FadeUp delay={0.62}>
+              <motion.a
+                href="https://maps.google.com/?q=Ambikapur,Surguja,Chhattisgarh"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.02, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                style={{
+                  display: "block", marginTop: 28, borderRadius: 16, overflow: "hidden",
+                  textDecoration: "none", cursor: "pointer", position: "relative",
+                  background: t.isDark
+                    ? "linear-gradient(145deg, #1A1008, #0D0705)"
+                    : "linear-gradient(145deg, #FDF8F0, #F7EFE2)",
+                  border: `1px solid ${t.border}`,
+                  boxShadow: `0 8px 32px ${t.shadow}`,
+                  transition: "border-color 0.3s, box-shadow 0.3s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = `${t.terra}66`;
+                  e.currentTarget.style.boxShadow = `0 12px 40px ${t.terra}22`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = t.border;
+                  e.currentTarget.style.boxShadow = `0 8px 32px ${t.shadow}`;
+                }}
+              >
+                {/* Decorative Map Illustration */}
+                <div style={{
+                  height: 120, position: "relative", overflow: "hidden",
+                  background: t.isDark
+                    ? `linear-gradient(135deg, ${t.terraDark}30, ${t.terra}15, ${t.gold}10)`
+                    : `linear-gradient(135deg, ${t.terra}12, ${t.gold}10, ${t.terraLight}08)`,
+                }}>
+                  {/* Grid lines to simulate map */}
+                  <div style={{ position: "absolute", inset: 0, opacity: 0.08 }}>
+                    {[...Array(8)].map((_, i) => (
+                      <div key={`h-${i}`} style={{ position: "absolute", top: `${i * 15}px`, left: 0, right: 0, height: 1, background: t.text2 }} />
+                    ))}
+                    {[...Array(12)].map((_, i) => (
+                      <div key={`v-${i}`} style={{ position: "absolute", left: `${i * 9}%`, top: 0, bottom: 0, width: 1, background: t.text2 }} />
+                    ))}
+                  </div>
+                  {/* Curved road */}
+                  <svg viewBox="0 0 400 120" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.15 }}>
+                    <path d="M0 80 C80 20, 160 100, 240 50 S360 90, 400 40" fill="none" stroke={t.terra} strokeWidth="3" strokeDasharray="8 6" />
+                    <path d="M0 100 C100 70, 200 110, 300 60 S380 100, 400 80" fill="none" stroke={t.gold} strokeWidth="2" strokeDasharray="5 5" />
+                  </svg>
+                  {/* Animated Pin */}
+                  <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <motion.div
+                      animate={{ y: [0, -8, 0] }}
+                      transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                      style={{
+                        width: 44, height: 44, borderRadius: "50%",
+                        background: `linear-gradient(135deg, ${t.terra}, ${t.terraDark})`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        boxShadow: `0 6px 24px ${t.terra}55`,
+                        border: "2.5px solid #F2E5CC",
+                      }}
+                    >
+                      <MapPinned size={20} color="#F2E5CC" />
+                    </motion.div>
+                    {/* Pulsing shadow beneath pin */}
+                    <motion.div
+                      animate={{ scale: [0.8, 1.3, 0.8], opacity: [0.35, 0.1, 0.35] }}
+                      transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                      style={{
+                        width: 30, height: 8, borderRadius: "50%", marginTop: 4,
+                        background: t.isDark ? "rgba(201,91,50,0.4)" : "rgba(201,91,50,0.25)",
+                        filter: "blur(3px)",
+                      }}
+                    />
+                  </div>
+                  {/* Gradient fade at bottom */}
+                  <div style={{
+                    position: "absolute", bottom: 0, left: 0, right: 0, height: 40,
+                    background: t.isDark
+                      ? "linear-gradient(transparent, #1A1008)"
+                      : "linear-gradient(transparent, #FDF8F0)",
+                  }} />
+                </div>
+
+                {/* Bottom Info Bar */}
+                <div style={{ padding: "18px 22px", display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{
+                    width: 42, height: 42, borderRadius: 12, flexShrink: 0,
+                    background: `linear-gradient(135deg, ${t.terra}18, ${t.gold}12)`,
+                    border: `1px solid ${t.terra}22`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <Globe size={18} style={{ color: t.terra }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: t.gold, marginBottom: 3 }}>
+                      Our Office Location
+                    </div>
+                    <div style={{ color: t.text1, fontSize: 13, fontWeight: 500, lineHeight: 1.5 }}>
+                      Ambikapur, Surguja, Chhattisgarh
+                    </div>
+                  </div>
+                  <div style={{
+                    padding: "10px 18px", borderRadius: 10, flexShrink: 0,
+                    background: `linear-gradient(135deg, ${t.terra}, ${t.terraDark})`,
+                    color: "#F2E5CC", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                    display: "flex", alignItems: "center", gap: 6,
+                    boxShadow: `0 4px 14px ${t.terra}33`,
+                  }}>
+                    <MapPinned size={12} />
+                    Open Map
+                  </div>
+                </div>
+              </motion.a>
+            </FadeUp>
           </div>
 
           {/* Right: form */}
@@ -3004,7 +3761,7 @@ Here are my details:
                     onChange={(e) => handleChange("name", e.target.value)}
                     style={iStyle}
                     onFocus={(e) => (e.target.style.borderColor = `${t.terra}99`)}
-                    onBlur={(e)  => (e.target.style.borderColor = t.border)}
+                    onBlur={(e) => (e.target.style.borderColor = t.border)}
                   />
                 </div>
 
@@ -3017,7 +3774,7 @@ Here are my details:
                     onChange={(e) => handleChange("phone", e.target.value)}
                     style={iStyle}
                     onFocus={(e) => (e.target.style.borderColor = `${t.terra}99`)}
-                    onBlur={(e)  => (e.target.style.borderColor = t.border)}
+                    onBlur={(e) => (e.target.style.borderColor = t.border)}
                   />
                 </div>
 
@@ -3030,7 +3787,7 @@ Here are my details:
                     onChange={(e) => handleChange("email", e.target.value)}
                     style={iStyle}
                     onFocus={(e) => (e.target.style.borderColor = `${t.terra}99`)}
-                    onBlur={(e)  => (e.target.style.borderColor = t.border)}
+                    onBlur={(e) => (e.target.style.borderColor = t.border)}
                   />
                 </div>
 
@@ -3057,7 +3814,7 @@ Here are my details:
                     onChange={(e) => handleChange("message", e.target.value)}
                     style={{ ...iStyle, resize: "vertical" }}
                     onFocus={(e) => (e.target.style.borderColor = `${t.terra}99`)}
-                    onBlur={(e)  => (e.target.style.borderColor = t.border)}
+                    onBlur={(e) => (e.target.style.borderColor = t.border)}
                   />
                 </div>
 
@@ -3097,44 +3854,382 @@ Here are my details:
 //  FOOTER
 // ══════════════════════════════════════════════════════════════
 function Footer({ t }) {
-  return (
-    <footer style={{ background: t.bg, borderTop: `1px solid ${t.border}`, padding: "50px 5%", transition: "background 0.5s" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
-          <UBLogo size={34} t={t} showTagline />
-          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-            {["Home", "Services", "About", "Contact"].map((lk) => (
-              <a key={lk} href={`#${lk.toLowerCase()}`}
-                style={{ color: t.text2, padding: "6px 12px", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", transition: "color 0.2s" }}
-                onMouseEnter={(e) => (e.target.style.color = t.terra)}
-                onMouseLeave={(e) => (e.target.style.color = t.text2)}
-              >{lk}</a>
-            ))}
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ color: t.text2, fontSize: 12 }}>© 2025 Urban Bricks. All rights reserved.</div>
-            <div style={{ color: t.text2, fontSize: 10, marginTop: 4, opacity: 0.55 }}>Ambikapur · Surguja · Chhattisgarh 497001</div>
-          </div>
-        </div>
+  const [emailHovered, setEmailHovered] = useState(false);
+  const footerRef = useRef(null);
+  const isInView = useInView(footerRef, { once: true, margin: "-80px" });
 
-        <div style={{ marginTop: 32, paddingTop: 24, borderTop: `1px solid ${t.border}`, display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
-          {[
-            { label: "Call Us",   href: "tel:+919810864670",                   icon: <Phone size={13} /> },
-            { label: "Email",     href: "mailto:chandan.urbanbricks@gmail.com", icon: <Mail  size={13} /> },
-            { label: "WhatsApp",  href: `https://wa.me/919810864670?text=${encodeURIComponent("Hello Urban Bricks, I am interested in your real estate services. Please connect with me.")}`,
-              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>,
-            },
-          ].map(({ label, href, icon }) => (
-            <a key={label} href={href}
-              target={href.startsWith("http") ? "_blank" : undefined}
-              rel="noopener noreferrer"
-              style={{ display: "flex", alignItems: "center", gap: 7, color: t.text2, fontSize: 12, letterSpacing: "0.08em", transition: "color 0.2s" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = t.terra)}
-              onMouseLeave={(e) => (e.currentTarget.style.color = t.text2)}
-            >{icon} {label}</a>
-          ))}
+  const quickLinks = [
+    { label: "Home", href: "#home" },
+    { label: "About Us", href: "#about" },
+    { label: "Services", href: "#services" },
+    { label: "Contact", href: "#contact" },
+  ];
+
+  const serviceLinks = [
+    { label: "Buy Property", icon: <Home size={12} /> },
+    { label: "Sell Property", icon: <Tag size={12} /> },
+    { label: "Rent / Lease", icon: <Key size={12} /> },
+    { label: "Brand Franchisee", icon: <Award size={12} /> },
+    { label: "Construction", icon: <HardHat size={12} /> },
+  ];
+
+  const contactItems = [
+    { icon: <Phone size={14} />, text: "+91 98108 64670", href: "tel:+919810864670" },
+    { icon: <Mail size={14} />, text: "urbanbricks.in@gmail.com", href: "mailto:urbanbricks.in@gmail.com" },
+    { icon: <MapPinned size={14} />, text: "Ambikapur, Surguja, Chhattisgarh 497001", href: null },
+  ];
+
+  const socialLinks = [
+    {
+      label: "WhatsApp", href: `https://wa.me/919810864670?text=${encodeURIComponent("Hello Urban Bricks, I am interested in your real estate services.")}`,
+      icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+    },
+    {
+      label: "Facebook", href: "#",
+      icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+    },
+    {
+      label: "Instagram", href: "#",
+      icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>
+    },
+  ];
+
+  return (
+    <footer ref={footerRef} style={{ position: "relative", overflow: "hidden", transition: "background 0.5s" }}>
+      {/* Animated Decorative Top Border */}
+      <div style={{ height: 3, background: `linear-gradient(90deg, ${t.terraDark}, ${t.terra}, ${t.gold}, ${t.terraLight}, ${t.terra}, ${t.terraDark})`, backgroundSize: "200% 100%", animation: "footerShimmer 4s linear infinite" }} />
+
+      {/* Decorative floating particles */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0.04, 0.12, 0.04],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{ repeat: Infinity, duration: 5 + i * 1.2, delay: i * 0.6, ease: "easeInOut" }}
+            style={{
+              position: "absolute",
+              width: 60 + i * 20,
+              height: 60 + i * 20,
+              borderRadius: "50%",
+              background: `radial-gradient(circle, ${i % 2 === 0 ? t.terra : t.gold}08, transparent 70%)`,
+              left: `${10 + i * 12}%`,
+              top: `${20 + (i % 3) * 25}%`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Main Footer Content */}
+      <div style={{
+        background: t.isDark
+          ? "linear-gradient(180deg, #0D0705 0%, #080403 40%, #050201 100%)"
+          : "linear-gradient(180deg, #F7EFE2 0%, #FDFBF7 40%, #F5ECD8 100%)",
+        padding: "70px 5% 0",
+        position: "relative",
+      }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+
+          {/* Top Section: Newsletter CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 30,
+              padding: "36px 44px", borderRadius: 20, marginBottom: 60, position: "relative", overflow: "hidden",
+              background: t.isDark
+                ? "linear-gradient(135deg, rgba(201,91,50,0.12), rgba(212,157,66,0.08))"
+                : "linear-gradient(135deg, rgba(201,91,50,0.08), rgba(212,157,66,0.06))",
+              border: `1px solid ${t.terra}22`,
+              backdropFilter: "blur(12px)",
+            }}
+          >
+            {/* Decorative corner glow */}
+            <div style={{ position: "absolute", top: -40, right: -40, width: 120, height: 120, borderRadius: "50%", background: `radial-gradient(circle, ${t.gold}18, transparent 70%)`, pointerEvents: "none" }} />
+            <div style={{ position: "absolute", bottom: -30, left: -30, width: 80, height: 80, borderRadius: "50%", background: `radial-gradient(circle, ${t.terra}14, transparent 70%)`, pointerEvents: "none" }} />
+
+            <div style={{ flex: "1 1 340px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${t.terra}, ${t.gold})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Mail size={18} color="#F2E5CC" />
+                </div>
+                <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 600, color: t.text1, margin: 0 }}>Stay Connected</h4>
+              </div>
+              <p style={{ color: t.text2, fontSize: 13, lineHeight: 1.6, margin: 0, maxWidth: 400 }}>
+                Get exclusive property listings, market insights, and investment opportunities delivered to your inbox.
+              </p>
+            </div>
+            <div style={{ flex: "1 1 300px", display: "flex", gap: 10, maxWidth: 420 }}>
+              <div style={{
+                flex: 1, position: "relative", borderRadius: 12, overflow: "hidden",
+                border: `1px solid ${emailHovered ? t.terra + '55' : t.border}`,
+                transition: "border-color 0.3s",
+              }}>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  onMouseEnter={() => setEmailHovered(true)}
+                  onMouseLeave={() => setEmailHovered(false)}
+                  style={{
+                    width: "100%", padding: "14px 18px", border: "none", outline: "none",
+                    background: t.isDark ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.7)",
+                    color: t.text1, fontSize: 13, fontFamily: "inherit", borderRadius: 12,
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.04, boxShadow: `0 8px 24px ${t.terra}44` }}
+                whileTap={{ scale: 0.96 }}
+                style={{
+                  padding: "14px 26px", borderRadius: 12, border: "none", cursor: "pointer",
+                  background: `linear-gradient(135deg, ${t.terra}, ${t.terraDark})`,
+                  color: "#F2E5CC", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                  fontFamily: "inherit", whiteSpace: "nowrap",
+                  boxShadow: `0 4px 16px ${t.terra}33`,
+                }}
+              >
+                Subscribe
+              </motion.button>
+            </div>
+          </motion.div>
+
+          {/* Main 4-Column Grid */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 48,
+            paddingBottom: 50,
+          }}>
+
+            {/* Column 1: Brand */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <div style={{ marginBottom: 24 }}>
+                <UBLogo size={36} t={t} showTagline />
+              </div>
+              <p style={{ color: t.text2, fontSize: 13, lineHeight: 1.8, marginBottom: 28, maxWidth: 280 }}>
+                Your trusted partner in premium real estate solutions. Connecting dreams with destinations since 2015.
+              </p>
+              {/* Social Links */}
+              <div style={{ display: "flex", gap: 10 }}>
+                {socialLinks.map((s) => (
+                  <motion.a
+                    key={s.label}
+                    href={s.href}
+                    target={s.href.startsWith("http") ? "_blank" : undefined}
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.15, y: -3 }}
+                    whileTap={{ scale: 0.9 }}
+                    style={{
+                      width: 40, height: 40, borderRadius: 12,
+                      background: t.isDark ? `${t.terra}14` : `${t.terra}0C`,
+                      border: `1px solid ${t.terra}22`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: t.text2, transition: "all 0.3s", cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `${t.terra}30`;
+                      e.currentTarget.style.color = t.terra;
+                      e.currentTarget.style.borderColor = `${t.terra}55`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = t.isDark ? `${t.terra}14` : `${t.terra}0C`;
+                      e.currentTarget.style.color = t.text2;
+                      e.currentTarget.style.borderColor = `${t.terra}22`;
+                    }}
+                  >
+                    {s.icon}
+                  </motion.a>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Column 2: Quick Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <h4 style={{
+                fontFamily: "'Cormorant Garamond', serif", fontSize: 18, fontWeight: 600, color: t.text1,
+                marginBottom: 24, position: "relative", paddingBottom: 14,
+              }}>
+                Quick Links
+                <span style={{
+                  position: "absolute", bottom: 0, left: 0, width: 32, height: 2.5,
+                  background: `linear-gradient(90deg, ${t.terra}, ${t.gold})`, borderRadius: 2,
+                }} />
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {quickLinks.map((link) => (
+                  <motion.a
+                    key={link.label}
+                    href={link.href}
+                    whileHover={{ x: 6 }}
+                    style={{
+                      color: t.text2, fontSize: 13, textDecoration: "none", padding: "7px 0",
+                      display: "flex", alignItems: "center", gap: 8, transition: "color 0.2s",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = t.terra)}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = t.text2)}
+                  >
+                    <ChevronRight size={12} style={{ opacity: 0.5 }} />
+                    {link.label}
+                  </motion.a>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Column 3: Our Services */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <h4 style={{
+                fontFamily: "'Cormorant Garamond', serif", fontSize: 18, fontWeight: 600, color: t.text1,
+                marginBottom: 24, position: "relative", paddingBottom: 14,
+              }}>
+                Our Services
+                <span style={{
+                  position: "absolute", bottom: 0, left: 0, width: 32, height: 2.5,
+                  background: `linear-gradient(90deg, ${t.terra}, ${t.gold})`, borderRadius: 2,
+                }} />
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {serviceLinks.map((svc) => (
+                  <motion.div
+                    key={svc.label}
+                    whileHover={{ x: 6 }}
+                    style={{
+                      color: t.text2, fontSize: 13, padding: "7px 0",
+                      display: "flex", alignItems: "center", gap: 10, cursor: "default", transition: "color 0.2s",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = t.terra)}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = t.text2)}
+                  >
+                    <span style={{ opacity: 0.6 }}>{svc.icon}</span>
+                    {svc.label}
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Column 4: Contact Info */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <h4 style={{
+                fontFamily: "'Cormorant Garamond', serif", fontSize: 18, fontWeight: 600, color: t.text1,
+                marginBottom: 24, position: "relative", paddingBottom: 14,
+              }}>
+                Get In Touch
+                <span style={{
+                  position: "absolute", bottom: 0, left: 0, width: 32, height: 2.5,
+                  background: `linear-gradient(90deg, ${t.terra}, ${t.gold})`, borderRadius: 2,
+                }} />
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {contactItems.map((item, ci) => (
+                  <div key={ci} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 10, flexShrink: 0, marginTop: 1,
+                      background: t.isDark ? `${t.terra}14` : `${t.terra}0C`,
+                      border: `1px solid ${t.terra}18`,
+                      display: "flex", alignItems: "center", justifyContent: "center", color: t.terra,
+                    }}>
+                      {item.icon}
+                    </div>
+                    <div>
+                      {item.href ? (
+                        <a href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined}
+                          rel="noopener noreferrer"
+                          style={{ color: t.text2, fontSize: 13, textDecoration: "none", lineHeight: 1.6, transition: "color 0.2s" }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = t.terra)}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = t.text2)}
+                        >
+                          {item.text}
+                        </a>
+                      ) : (
+                        <span style={{ color: t.text2, fontSize: 13, lineHeight: 1.6 }}>{item.text}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Business Hours */}
+              <div style={{
+                marginTop: 22, padding: "14px 16px", borderRadius: 12,
+                background: t.isDark ? `${t.gold}08` : `${t.gold}0A`,
+                border: `1px solid ${t.gold}18`,
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: t.gold, marginBottom: 8 }}>
+                  Business Hours
+                </div>
+                <div style={{ fontSize: 12, color: t.text2, lineHeight: 1.7 }}>
+                  Mon – Sat: 9:00 AM – 7:00 PM<br />
+                  Sunday: By Appointment
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Divider with decorative element */}
+          <div style={{ position: "relative", marginTop: 10 }}>
+            <div style={{ height: 1, background: `linear-gradient(90deg, transparent, ${t.border}, ${t.terra}44, ${t.border}, transparent)` }} />
+            <div style={{
+              position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
+              width: 20, height: 20, borderRadius: "50%", background: t.isDark ? "#0D0705" : "#F7EFE2",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <div style={{ width: 7, height: 7, borderRadius: "50%", background: `linear-gradient(135deg, ${t.terra}, ${t.gold})` }} />
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16,
+            padding: "28px 0 36px",
+          }}>
+            <div style={{ color: t.text2, fontSize: 12, opacity: 0.7 }}>
+              © 2015 – {new Date().getFullYear()} <span style={{ color: t.terra, fontWeight: 600 }}>Urban Bricks</span>. All rights reserved.
+            </div>
+            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+              {["Privacy Policy", "Terms of Service", "Disclaimer"].map((lk) => (
+                <a key={lk} href="#"
+                  style={{ color: t.text2, fontSize: 11, opacity: 0.6, textDecoration: "none", letterSpacing: "0.06em", transition: "all 0.2s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = t.terra; e.currentTarget.style.opacity = "1"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = t.text2; e.currentTarget.style.opacity = "0.6"; }}
+                >
+                  {lk}
+                </a>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: t.text2, opacity: 0.4, letterSpacing: "0.04em" }}>
+              Crafted with ♥ in India
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* CSS Keyframe for shimmer animation */}
+      <style>{`
+        @keyframes footerShimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+      `}</style>
     </footer>
   );
 }
@@ -3158,7 +4253,7 @@ function WhatsAppFAB() {
       }}
     >
       <svg viewBox="0 0 24 24" width="32" height="32" fill="white">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
       </svg>
     </motion.a>
   );
@@ -3167,15 +4262,390 @@ function WhatsAppFAB() {
 // ══════════════════════════════════════════════════════════════
 //  MAIN SITE
 // ══════════════════════════════════════════════════════════════
+function BrandLogo({ brand, t }) {
+  const isDark = t.isDark;
+
+  const getBrandDetails = (name) => {
+    switch (name) {
+      case "Zudio":
+        return {
+          bg: "#080808",
+          border: "1px solid #444",
+          color: "#FFFFFF",
+          fontFamily: "'Montserrat', sans-serif",
+          fontWeight: 800,
+          letterSpacing: "3px",
+          text: "ZUDIO",
+          icon: <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#D49D42", marginRight: 8 }} />
+        };
+      case "Lenskart":
+        return {
+          bg: isDark ? "#0A121E" : "#F4F7FC",
+          border: "1px solid #1E40AF",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#FFA500" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="12" r="3" />
+                <line x1="9" y1="12" x2="15" y2="12" />
+              </svg>
+              <span style={{ color: isDark ? "#93C5FD" : "#1E40AF", fontWeight: 700 }}>lens</span>
+              <span style={{ color: "#FFA500", fontWeight: 800 }}>kart</span>
+            </div>
+          )
+        };
+      case "ICICI Bank":
+        return {
+          bg: isDark ? "#2A0E0B" : "#FFF7F2",
+          border: "1.5px solid #C2410C",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ color: "#C2410C", fontWeight: 800, fontSize: 15, fontFamily: "Georgia, serif", fontStyle: "italic" }}>i</span>
+              <span style={{ color: "#C2410C", fontWeight: 700 }}>ICICI Bank</span>
+            </div>
+          )
+        };
+      case "Apollo Pharmacy":
+        return {
+          bg: isDark ? "#061A14" : "#F0FDF4",
+          border: "1px solid #15803D",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="#E53935">
+                <path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z" />
+              </svg>
+              <span style={{ color: isDark ? "#4ADE80" : "#15803D", fontWeight: 800, fontSize: 12, letterSpacing: "1px" }}>APOLLO</span>
+              <span style={{ color: "#E53935", fontWeight: 600, fontSize: 10 }}>PHARMACY</span>
+            </div>
+          )
+        };
+      case "Cantabile":
+        return {
+          bg: isDark ? "#1E1B4B" : "#EEF2FF",
+          border: "1px solid #4338CA",
+          color: "#4338CA",
+          fontFamily: "Georgia, serif",
+          fontWeight: 600,
+          fontStyle: "italic",
+          text: "Cantabile",
+          icon: (
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style={{ marginRight: 6 }}>
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+          )
+        };
+      case "Mufti":
+        return {
+          bg: isDark ? "#1E293B" : "#F1F5F9",
+          border: "1px solid #475569",
+          color: isDark ? "#E2E8F0" : "#0F172A",
+          fontFamily: "'Courier New', monospace",
+          fontWeight: 700,
+          letterSpacing: "3px",
+          text: "MUFTI"
+        };
+      case "Dulhe Sahab":
+        return {
+          bg: isDark ? "#271E0C" : "#FDF8E4",
+          border: "1px solid #D49D42",
+          color: "#D49D42",
+          fontFamily: "'Cormorant Garamond', serif",
+          fontWeight: 700,
+          text: "Dulhe Sahab",
+          icon: <span style={{ color: "#D49D42", marginRight: 6, fontSize: 14 }}>❖</span>
+        };
+      case "Policybazaar":
+        return {
+          bg: isDark ? "#081E2E" : "#F0F8FF",
+          border: "1px solid #0284C7",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ color: "#0284C7", fontWeight: 700 }}>policy</span>
+              <span style={{ color: "#F59E0B", fontWeight: 800 }}>bazaar</span>
+              <span style={{ fontSize: 9, padding: "1px 4px", background: "#0284C7", color: "#FFF", borderRadius: 3, fontWeight: 700, marginLeft: 2 }}>pb</span>
+            </div>
+          )
+        };
+      case "Muthoot Finance":
+        return {
+          bg: isDark ? "#270E0F" : "#FEF2F2",
+          border: "1px solid #DC2626",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ color: "#F59E0B", fontSize: 11 }}>● Muthoot</span>
+              <span style={{ color: "#DC2626", fontWeight: 700 }}>Finance</span>
+            </div>
+          )
+        };
+      case "Campus":
+        return {
+          bg: "#991B1B",
+          border: "1px solid #B91C1C",
+          color: "#FFFFFF",
+          fontFamily: "'Arial Black', sans-serif",
+          fontStyle: "italic",
+          letterSpacing: "1px",
+          text: "CAMPUS",
+          icon: <div style={{ width: 10, height: 2, background: "#FFF", transform: "skewX(-20deg)", marginRight: 6 }} />
+        };
+      case "3C Group":
+        return {
+          bg: isDark ? "#061F17" : "#ECFDF5",
+          border: "1px solid #059669",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ color: "#059669", fontWeight: 900, fontSize: 15 }}>3C</span>
+              <span style={{ color: isDark ? "#A7F3D0" : "#047857", fontWeight: 500, fontSize: 11, letterSpacing: "1px" }}>GROUP</span>
+            </div>
+          )
+        };
+      case "JM Housing":
+        return {
+          bg: isDark ? "#082F49" : "#F0F9FF",
+          border: "1px solid #0284C7",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#0284C7" strokeWidth="2.5">
+                <path d="M3 21h18M3 21V8l9-4 9 4v13M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6" />
+              </svg>
+              <span style={{ color: "#0284C7", fontWeight: 800 }}>JM</span>
+              <span style={{ color: isDark ? "#7DD3FC" : "#0369A1", fontSize: 12 }}>Housing</span>
+            </div>
+          )
+        };
+      case "Supertech":
+        return {
+          bg: isDark ? "#172554" : "#EFF6FF",
+          border: "1px solid #2563EB",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ color: "#2563EB", fontWeight: 800, letterSpacing: "0.5px" }}>SUPER</span>
+              <span style={{ color: "#D49D42", fontWeight: 700 }}>TECH</span>
+            </div>
+          )
+        };
+      case "Elite Group":
+        return {
+          bg: isDark ? "#1E1E1E" : "#FAF5FF",
+          border: "1px solid #8B5CF6",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ color: "#D49D42", fontWeight: 600 }}>♛</span>
+              <span style={{ color: isDark ? "#DDD6FE" : "#6D28D9", fontWeight: 700, fontFamily: "Georgia, serif" }}>ELITE</span>
+            </div>
+          )
+        };
+      case "Ajnara Group":
+        return {
+          bg: isDark ? "#2E1005" : "#FFF7ED",
+          border: "1px solid #C2410C",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ color: "#C2410C", fontWeight: 800, letterSpacing: "1px" }}>AJNARA</span>
+            </div>
+          )
+        };
+      case "Panchsheel Group":
+        return {
+          bg: isDark ? "#112F28" : "#F0FDF4",
+          border: "1px solid #16A34A",
+          customRender: (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ color: "#16A34A", fontWeight: 800 }}>★</span>
+              <span style={{ color: isDark ? "#86EFAC" : "#15803D", fontWeight: 700, fontSize: 11.5, letterSpacing: "0.5px" }}>PANCHSHEEL</span>
+            </div>
+          )
+        };
+      default:
+        return {
+          bg: t.card,
+          border: `1.5px solid ${t.border}`,
+          color: t.text1,
+          fontWeight: 600,
+          text: name
+        };
+    }
+  };
+
+  const details = getBrandDetails(brand);
+  const borderCol = details.border.split(" ").slice(2).join(" ");
+
+  return (
+    <div
+      style={{
+        padding: "12px 28px",
+        background: details.bg,
+        border: details.border,
+        borderRadius: "12px",
+        color: details.color || t.text1,
+        fontFamily: details.fontFamily || "'Jost', sans-serif",
+        fontWeight: details.fontWeight || 600,
+        fontSize: "13px",
+        letterSpacing: details.letterSpacing || "normal",
+        fontStyle: details.fontStyle || "normal",
+        boxShadow: `0 8px 24px ${t.shadow}12`,
+        whiteSpace: "nowrap",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "default",
+        transition: "all 0.3s",
+        transformStyle: "preserve-3d"
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-4px) scale(1.05)";
+        e.currentTarget.style.boxShadow = `0 12px 30px ${t.terra}28`;
+        e.currentTarget.style.borderColor = `${t.terra}aa`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "none";
+        e.currentTarget.style.boxShadow = `0 8px 24px ${t.shadow}12`;
+        e.currentTarget.style.borderColor = borderCol;
+      }}
+    >
+      {details.customRender ? details.customRender : (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {details.icon}
+          {details.text}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FounderProfile({ t }) {
+  const brands = [
+    "Zudio", "Lenskart", "ICICI Bank", "Apollo Pharmacy", "Cantabile", "Mufti", "Dulhe Sahab",
+    "Policybazaar", "Muthoot Finance", "Campus", "3C Group", "JM Housing", "Supertech",
+    "Elite Group", "Ajnara Group", "Panchsheel Group"
+  ];
+  const duplicatedBrands = [...brands, ...brands];
+
+  const fadeSpring = { type: "spring", stiffness: 100, damping: 20 };
+
+  return (
+    <section id="founder" style={{ background: t.bgAlt, padding: "100px 5% 108px 5%", transition: "background 0.5s", position: "relative", overflow: "hidden" }}>
+      <div className="blueprint-grid" style={{ opacity: t.isDark ? 0.25 : 0.35 }} />
+
+      <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
+        <SectionLabel text="Leadership & Founder" center t={t} />
+        <div style={{ textAlign: "center", marginBottom: 54 }}>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(30px, 4.5vw, 48px)", fontWeight: 600, color: t.text1, lineHeight: 1.15 }}>
+            Meet Our Founder
+          </h2>
+        </div>
+
+        <div className="ub-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: "50px", alignItems: "center", marginBottom: 72 }}>
+          {/* Portrait Column */}
+          <FadeUp delay={0.1}>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <motion.div
+                whileHover={{ scale: 1.03, rotate: -2 }}
+                transition={fadeSpring}
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  maxWidth: "320px",
+                  aspectRatio: "3/4",
+                  borderRadius: "20px",
+                  background: `linear-gradient(135deg, ${t.card}, rgba(30,15,10,0.1))`,
+                  border: `1px solid ${t.border}`,
+                  padding: "12px",
+                  boxShadow: `0 20px 50px ${t.shadow}`,
+                }}
+              >
+                {/* Dual offset outline frames */}
+                <div style={{ position: "absolute", inset: "-4px", borderRadius: "24px", border: `1.5px solid ${t.gold}`, opacity: 0.45, pointerEvents: "none" }} />
+                <div style={{ position: "absolute", inset: "4px", borderRadius: "16px", border: `1px solid ${t.terra}`, opacity: 0.3, pointerEvents: "none" }} />
+
+                {/* Photo frame */}
+                <div style={{
+                  width: "100%", height: "100%", borderRadius: "14px", overflow: "hidden", position: "relative",
+                  background: "linear-gradient(145deg, #2D1810, #140804)", display: "flex", alignItems: "center", justifyCenter: "center"
+                }}>
+                  <div className="blueprint-grid" style={{ opacity: 0.12 }} />
+                  <motion.img
+                    src={founderImg}
+                    alt="Chandan Soni"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.4 }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%" }}
+                  />
+                  {/* Luxury Monogram circular badge */}
+                  <div style={{
+                    position: "absolute", bottom: 12, right: 12,
+                    width: 50, height: 50, borderRadius: "50%",
+                    background: `linear-gradient(135deg, ${t.gold}, ${t.terraDark})`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    border: `2px solid ${t.text1}`, boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
+                  }}>
+                    <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 700, color: "#F2E5CC" }}>CS</span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </FadeUp>
+
+          {/* Description Card */}
+          <FadeUp delay={0.2}>
+            <div style={{
+              background: t.card, border: `1px solid ${t.border}`, borderLeft: `4px solid ${t.terra}`,
+              borderRadius: "16px", padding: "40px", boxShadow: `0 15px 45px ${t.shadow}`, position: "relative"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16, marginBottom: 20 }}>
+                <div>
+                  <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 600, color: t.text1 }}>Chandan Soni</h3>
+                  <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: t.gold, fontWeight: 600, marginTop: 4 }}>
+                    Founder & Property Consultant
+                  </div>
+                </div>
+                <div style={{ padding: "6px 14px", background: `${t.terra}18`, color: t.terra, borderRadius: 20, fontSize: 12, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", border: `1px solid ${t.terra}33` }}>
+                  16+ Years Experience
+                </div>
+              </div>
+              <p style={{ color: t.text2, fontSize: 14.5, lineHeight: 1.8, marginBottom: 14, opacity: 0.95 }}>
+                Chandan Soni brings over <strong>16 years of distinguished experience</strong> in real estate consulting, specializing in high-value commercial and residential sales, rentals, and leasing. His impressive career includes successful collaborations with industry giants in Noida, such as the <strong>3C Group, JM Housing, Supertech, Elite Group, Ajnara Group, and Panchsheel Group</strong>.
+              </p>
+              <p style={{ color: t.text2, fontSize: 14.5, lineHeight: 1.8, marginBottom: 14, opacity: 0.95 }}>
+                Over the past six years, Chandan has pivotally expanded his footprint in Chhattisgarh, successfully facilitating premium property leases for leading national brands, including <strong>Zudio, Lenskart, ICICI Bank, Apollo Pharmacy, Cantabile, Mufti, Dulhe Sahab, Policybazaar, Muthoot Finance, and Campus</strong>.
+              </p>
+              <p style={{ color: t.text2, fontSize: 14.5, lineHeight: 1.8, opacity: 0.95 }}>
+                Known for his strategic vision and operational excellence, Chandan excels at driving growth, maximizing efficiency, and optimizing transactional costs for his clients. Demonstrating a strong entrepreneurial drive, he founded Urbanbricks—a premier real estate portal dedicated to delivering world-class leasing and rental solutions.
+              </p>
+            </div>
+          </FadeUp>
+        </div>
+
+        {/* Brand Collaborations marquee */}
+        <FadeUp delay={0.3}>
+          <div style={{ borderTop: `1px solid ${t.border}`, paddingTop: 48 }}>
+            <div style={{ textAlign: "center", fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: t.gold, fontWeight: 600, marginBottom: 32 }}>
+              Successful Collaborations & Brand Leases
+            </div>
+            <div className="marquee-container">
+              <div className="marquee-track">
+                {duplicatedBrands.map((brand, idx) => (
+                  <BrandLogo key={`${brand}-${idx}`} brand={brand} t={t} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </FadeUp>
+      </div>
+    </section>
+  );
+}
+
 function MainSite({ t, isDark, onToggle }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
       <Navbar t={t} isDark={isDark} onToggle={onToggle} />
-      <Hero    t={t} isDark={isDark} />
-      <About   t={t} />
+      <Hero t={t} isDark={isDark} />
+      <About t={t} />
       <Services t={t} />
-      <Contact  t={t} />
-      <Footer   t={t} />
+      <Contact t={t} />
+      <FounderProfile t={t} />
+      <Footer t={t} />
       <WhatsAppFAB />
     </motion.div>
   );
@@ -3195,7 +4665,7 @@ export default function UrbanBricks() {
   const toggleTheme = useCallback(() => {
     setIsDark((d) => {
       const next = !d;
-      try { localStorage.setItem("ub-theme", next ? "dark" : "light"); } catch {}
+      try { localStorage.setItem("ub-theme", next ? "dark" : "light"); } catch { }
       return next;
     });
   }, []);
