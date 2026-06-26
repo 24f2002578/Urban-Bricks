@@ -3885,11 +3885,11 @@ function Footer({ t }) {
       icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
     },
     {
-      label: "Facebook", href: "#",
+      label: "Facebook", href: "https://www.facebook.com/114082557010792/",
       icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
     },
     {
-      label: "Instagram", href: "#",
+      label: "Instagram", href: "https://www.instagram.com/urbanbricks043?igsh=MWJsbTA5MjA2enBrbQ==",
       icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>
     },
   ];
@@ -4263,252 +4263,51 @@ function WhatsAppFAB() {
 //  MAIN SITE
 // ══════════════════════════════════════════════════════════════
 function BrandLogo({ brand, t }) {
-  const isDark = t.isDark;
-
-  const getBrandDetails = (name) => {
-    switch (name) {
-      case "Zudio":
-        return {
-          bg: "#080808",
-          border: "1px solid #444",
-          color: "#FFFFFF",
-          fontFamily: "'Montserrat', sans-serif",
-          fontWeight: 800,
-          letterSpacing: "3px",
-          text: "ZUDIO",
-          icon: <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#D49D42", marginRight: 8 }} />
-        };
-      case "Lenskart":
-        return {
-          bg: isDark ? "#0A121E" : "#F4F7FC",
-          border: "1px solid #1E40AF",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#FFA500" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="12" r="3" />
-                <line x1="9" y1="12" x2="15" y2="12" />
-              </svg>
-              <span style={{ color: isDark ? "#93C5FD" : "#1E40AF", fontWeight: 700 }}>lens</span>
-              <span style={{ color: "#FFA500", fontWeight: 800 }}>kart</span>
-            </div>
-          )
-        };
-      case "ICICI Bank":
-        return {
-          bg: isDark ? "#2A0E0B" : "#FFF7F2",
-          border: "1.5px solid #C2410C",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#C2410C", fontWeight: 800, fontSize: 15, fontFamily: "Georgia, serif", fontStyle: "italic" }}>i</span>
-              <span style={{ color: "#C2410C", fontWeight: 700 }}>ICICI Bank</span>
-            </div>
-          )
-        };
-      case "Apollo Pharmacy":
-        return {
-          bg: isDark ? "#061A14" : "#F0FDF4",
-          border: "1px solid #15803D",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="#E53935">
-                <path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z" />
-              </svg>
-              <span style={{ color: isDark ? "#4ADE80" : "#15803D", fontWeight: 800, fontSize: 12, letterSpacing: "1px" }}>APOLLO</span>
-              <span style={{ color: "#E53935", fontWeight: 600, fontSize: 10 }}>PHARMACY</span>
-            </div>
-          )
-        };
-      case "Cantabile":
-        return {
-          bg: isDark ? "#1E1B4B" : "#EEF2FF",
-          border: "1px solid #4338CA",
-          color: "#4338CA",
-          fontFamily: "Georgia, serif",
-          fontWeight: 600,
-          fontStyle: "italic",
-          text: "Cantabile",
-          icon: (
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style={{ marginRight: 6 }}>
-              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-            </svg>
-          )
-        };
-      case "Mufti":
-        return {
-          bg: isDark ? "#1E293B" : "#F1F5F9",
-          border: "1px solid #475569",
-          color: isDark ? "#E2E8F0" : "#0F172A",
-          fontFamily: "'Courier New', monospace",
-          fontWeight: 700,
-          letterSpacing: "3px",
-          text: "MUFTI"
-        };
-      case "Dulhe Sahab":
-        return {
-          bg: isDark ? "#271E0C" : "#FDF8E4",
-          border: "1px solid #D49D42",
-          color: "#D49D42",
-          fontFamily: "'Cormorant Garamond', serif",
-          fontWeight: 700,
-          text: "Dulhe Sahab",
-          icon: <span style={{ color: "#D49D42", marginRight: 6, fontSize: 14 }}>❖</span>
-        };
-      case "Policybazaar":
-        return {
-          bg: isDark ? "#081E2E" : "#F0F8FF",
-          border: "1px solid #0284C7",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ color: "#0284C7", fontWeight: 700 }}>policy</span>
-              <span style={{ color: "#F59E0B", fontWeight: 800 }}>bazaar</span>
-              <span style={{ fontSize: 9, padding: "1px 4px", background: "#0284C7", color: "#FFF", borderRadius: 3, fontWeight: 700, marginLeft: 2 }}>pb</span>
-            </div>
-          )
-        };
-      case "Muthoot Finance":
-        return {
-          bg: isDark ? "#270E0F" : "#FEF2F2",
-          border: "1px solid #DC2626",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#F59E0B", fontSize: 11 }}>● Muthoot</span>
-              <span style={{ color: "#DC2626", fontWeight: 700 }}>Finance</span>
-            </div>
-          )
-        };
-      case "Campus":
-        return {
-          bg: "#991B1B",
-          border: "1px solid #B91C1C",
-          color: "#FFFFFF",
-          fontFamily: "'Arial Black', sans-serif",
-          fontStyle: "italic",
-          letterSpacing: "1px",
-          text: "CAMPUS",
-          icon: <div style={{ width: 10, height: 2, background: "#FFF", transform: "skewX(-20deg)", marginRight: 6 }} />
-        };
-      case "3C Group":
-        return {
-          bg: isDark ? "#061F17" : "#ECFDF5",
-          border: "1px solid #059669",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <span style={{ color: "#059669", fontWeight: 900, fontSize: 15 }}>3C</span>
-              <span style={{ color: isDark ? "#A7F3D0" : "#047857", fontWeight: 500, fontSize: 11, letterSpacing: "1px" }}>GROUP</span>
-            </div>
-          )
-        };
-      case "JM Housing":
-        return {
-          bg: isDark ? "#082F49" : "#F0F9FF",
-          border: "1px solid #0284C7",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#0284C7" strokeWidth="2.5">
-                <path d="M3 21h18M3 21V8l9-4 9 4v13M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6" />
-              </svg>
-              <span style={{ color: "#0284C7", fontWeight: 800 }}>JM</span>
-              <span style={{ color: isDark ? "#7DD3FC" : "#0369A1", fontSize: 12 }}>Housing</span>
-            </div>
-          )
-        };
-      case "Supertech":
-        return {
-          bg: isDark ? "#172554" : "#EFF6FF",
-          border: "1px solid #2563EB",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ color: "#2563EB", fontWeight: 800, letterSpacing: "0.5px" }}>SUPER</span>
-              <span style={{ color: "#D49D42", fontWeight: 700 }}>TECH</span>
-            </div>
-          )
-        };
-      case "Elite Group":
-        return {
-          bg: isDark ? "#1E1E1E" : "#FAF5FF",
-          border: "1px solid #8B5CF6",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <span style={{ color: "#D49D42", fontWeight: 600 }}>♛</span>
-              <span style={{ color: isDark ? "#DDD6FE" : "#6D28D9", fontWeight: 700, fontFamily: "Georgia, serif" }}>ELITE</span>
-            </div>
-          )
-        };
-      case "Ajnara Group":
-        return {
-          bg: isDark ? "#2E1005" : "#FFF7ED",
-          border: "1px solid #C2410C",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <span style={{ color: "#C2410C", fontWeight: 800, letterSpacing: "1px" }}>AJNARA</span>
-            </div>
-          )
-        };
-      case "Panchsheel Group":
-        return {
-          bg: isDark ? "#112F28" : "#F0FDF4",
-          border: "1px solid #16A34A",
-          customRender: (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#16A34A", fontWeight: 800 }}>★</span>
-              <span style={{ color: isDark ? "#86EFAC" : "#15803D", fontWeight: 700, fontSize: 11.5, letterSpacing: "0.5px" }}>PANCHSHEEL</span>
-            </div>
-          )
-        };
-      default:
-        return {
-          bg: t.card,
-          border: `1.5px solid ${t.border}`,
-          color: t.text1,
-          fontWeight: 600,
-          text: name
-        };
-    }
-  };
-
-  const details = getBrandDetails(brand);
-  const borderCol = details.border.split(" ").slice(2).join(" ");
+  const fileName = brand.toLowerCase().replace(/\s+/g, "-") + ".png";
+  const fileUrl = `/brands/${fileName}`;
 
   return (
     <div
       style={{
-        padding: "12px 28px",
-        background: details.bg,
-        border: details.border,
+        padding: "10px 20px",
+        background: t.isDark ? "rgba(26, 14, 10, 0.4)" : "rgba(255, 255, 255, 0.65)",
+        border: `1px solid ${t.border}`,
         borderRadius: "12px",
-        color: details.color || t.text1,
-        fontFamily: details.fontFamily || "'Jost', sans-serif",
-        fontWeight: details.fontWeight || 600,
-        fontSize: "13px",
-        letterSpacing: details.letterSpacing || "normal",
-        fontStyle: details.fontStyle || "normal",
-        boxShadow: `0 8px 24px ${t.shadow}12`,
+        boxShadow: `0 4px 16px ${t.shadow}08`,
         whiteSpace: "nowrap",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         cursor: "default",
         transition: "all 0.3s",
-        transformStyle: "preserve-3d"
+        height: "50px",
+        minWidth: "135px",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px) scale(1.05)";
-        e.currentTarget.style.boxShadow = `0 12px 30px ${t.terra}28`;
+        e.currentTarget.style.transform = "translateY(-3px) scale(1.03)";
+        e.currentTarget.style.boxShadow = `0 8px 24px ${t.terra}22`;
         e.currentTarget.style.borderColor = `${t.terra}aa`;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "none";
-        e.currentTarget.style.boxShadow = `0 8px 24px ${t.shadow}12`;
-        e.currentTarget.style.borderColor = borderCol;
+        e.currentTarget.style.boxShadow = `0 4px 16px ${t.shadow}08`;
+        e.currentTarget.style.borderColor = t.border;
       }}
     >
-      {details.customRender ? details.customRender : (
-        <div style={{ display: "flex", alignItems: "center" }}>
-          {details.icon}
-          {details.text}
-        </div>
-      )}
+      <img
+        src={fileUrl}
+        alt={brand}
+        onError={(e) => {
+          if (e.target.src !== window.location.origin + "/brands/sample.png") {
+            e.target.src = "/brands/sample.png";
+          }
+        }}
+        style={{
+          maxHeight: "30px",
+          maxWidth: "105px",
+          objectFit: "contain",
+        }}
+      />
     </div>
   );
 }
