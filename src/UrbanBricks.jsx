@@ -3473,7 +3473,7 @@ function Contact({ t }) {
     { Icon: Phone, label: "Mobile", value: "+91 9810864670", href: "tel:+919810864670" },
     { Icon: Mail, label: "Email", value: "urbanbricks.in@gmail.com", href: "mailto:urbanbricks.in@gmail.com" },
     { Icon: Globe, label: "Website", value: "urbanbricks.in", href: "https://urbanbricks.in" },
-    { Icon: MapPinned, label: "Address", value: "1st Floor, Aashish Electricals, Beside Carmel School, Namnakala, Ambikapur, Surguja (C.G.) 497001", href: "#" },
+    { Icon: MapPinned, label: "Address", value: "1st Floor, Aashish Electricals, Beside Carmel School, Namnakala, Ambikapur, Surguja (C.G.) 497001", href: "https://share.google/ZlY47jk5M6StzRWSf" },
   ];
 
   const iStyle = {
@@ -3606,7 +3606,7 @@ Here are my details:
             {/* Office Location — Google Maps Card */}
             <FadeUp delay={0.62}>
               <motion.a
-                href="https://maps.google.com/?q=Ambikapur,Surguja,Chhattisgarh"
+                href="https://share.google/ZlY47jk5M6StzRWSf"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.02, y: -4 }}
@@ -3876,7 +3876,7 @@ function Footer({ t }) {
   const contactItems = [
     { icon: <Phone size={14} />, text: "+91 98108 64670", href: "tel:+919810864670" },
     { icon: <Mail size={14} />, text: "urbanbricks.in@gmail.com", href: "mailto:urbanbricks.in@gmail.com" },
-    { icon: <MapPinned size={14} />, text: "Ambikapur, Surguja, Chhattisgarh 497001", href: null },
+    { icon: <MapPinned size={14} />, text: "Ambikapur, Surguja, Chhattisgarh 497001", href: "https://share.google/ZlY47jk5M6StzRWSf" },
   ];
 
   const socialLinks = [
