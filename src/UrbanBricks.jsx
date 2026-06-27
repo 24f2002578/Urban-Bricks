@@ -4446,6 +4446,7 @@ function BrandLogo({ brand, t }) {
           maxHeight: "50px",
           maxWidth: "140px",
           objectFit: "contain",
+          filter: (t.isDark && ["zudio", "cantabile"].includes(brand.toLowerCase())) ? "brightness(0) invert(1)" : "none",
         }}
       />
     </div>
