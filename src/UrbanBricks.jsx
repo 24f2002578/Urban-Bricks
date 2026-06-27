@@ -4041,7 +4041,7 @@ function Footer({ t }) {
       </div>
 
       {/* Main Footer Content */}
-      <div style={{
+      <div className="site-footer-container" style={{
         background: t.isDark
           ? "linear-gradient(180deg, #0D0705 0%, #080403 40%, #050201 100%)"
           : "linear-gradient(180deg, #F7EFE2 0%, #FDFBF7 40%, #F5ECD8 100%)",
@@ -4052,6 +4052,7 @@ function Footer({ t }) {
 
           {/* Top Section: Newsletter CTA */}
           <motion.div
+            className="footer-newsletter-cta"
             initial={{ opacity: 0, y: 40 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, ease: "easeOut" }}
@@ -4116,7 +4117,7 @@ function Footer({ t }) {
           </motion.div>
 
           {/* Main 4-Column Grid */}
-          <div style={{
+          <div className="footer-grid" style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
             gap: 48,
@@ -4136,7 +4137,7 @@ function Footer({ t }) {
                 Your trusted partner in premium real estate solutions. Connecting dreams with destinations since 2015.
               </p>
               {/* Social Links */}
-              <div style={{ display: "flex", gap: 10 }}>
+              <div className="social-links" style={{ display: "flex", gap: 10 }}>
                 {socialLinks.map((s) => (
                   <motion.a
                     key={s.label}
@@ -4169,8 +4170,8 @@ function Footer({ t }) {
               </div>
 
               {/* Google Review Badge */}
-              <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <div className="google-review-badge" style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 8 }}>
+                <div className="google-review-stars" style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   {[...Array(5)].map((_, idx) => (
                     <span key={idx} style={{ color: "#FFD700", fontSize: 15 }}>★</span>
                   ))}
@@ -4212,6 +4213,7 @@ function Footer({ t }) {
                 {quickLinks.map((link) => (
                   <motion.a
                     key={link.label}
+                    className="footer-link-item"
                     href={link.href}
                     whileHover={{ x: 6 }}
                     style={{
@@ -4248,6 +4250,7 @@ function Footer({ t }) {
                 {serviceLinks.map((svc) => (
                   <motion.div
                     key={svc.label}
+                    className="footer-link-item"
                     whileHover={{ x: 6 }}
                     style={{
                       color: t.text2, fontSize: 13, padding: "7px 0",
@@ -4279,9 +4282,9 @@ function Footer({ t }) {
                   background: `linear-gradient(90deg, ${t.terra}, ${t.gold})`, borderRadius: 2,
                 }} />
               </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div className="contact-list" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {contactItems.map((item, ci) => (
-                  <div key={ci} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <div key={ci} className="contact-item" style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                     <div style={{
                       width: 34, height: 34, borderRadius: 10, flexShrink: 0, marginTop: 1,
                       background: t.isDark ? `${t.terra}14` : `${t.terra}0C`,
@@ -4309,7 +4312,7 @@ function Footer({ t }) {
               </div>
 
               {/* Business Hours */}
-              <div style={{
+              <div className="business-hours" style={{
                 marginTop: 22, padding: "14px 16px", borderRadius: 12,
                 background: t.isDark ? `${t.gold}08` : `${t.gold}0A`,
                 border: `1px solid ${t.gold}18`,
@@ -4338,12 +4341,22 @@ function Footer({ t }) {
           </div>
 
           {/* Bottom Bar */}
-          <div style={{
+          <div className="site-footer-bottom" style={{
             display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16,
             padding: "28px 0 36px",
           }}>
             <div style={{ color: t.text2, fontSize: 12, opacity: 0.7 }}>
               © 2015 – {new Date().getFullYear()} <span style={{ color: t.terra, fontWeight: 600 }}>Urban Bricks</span>. All rights reserved.
+            </div>
+            <div style={{ fontSize: 11, color: t.text2, opacity: 0.4, letterSpacing: "0.04em" }}>
+              Designed & Built by{" "}
+              <a href="mailto:himharihiw@gmail.com"
+                style={{ color: t.text2, textDecoration: "none", transition: "all 0.2s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = t.terra; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = t.text2; }}
+              >
+                Himanshi Hiwarekar
+              </a>
             </div>
             <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
               {["Privacy Policy", "Terms of Service", "Disclaimer"].map((lk) => (
@@ -4356,16 +4369,6 @@ function Footer({ t }) {
                 </a>
               ))}
             </div>
-            <div style={{ fontSize: 11, color: t.text2, opacity: 0.4, letterSpacing: "0.04em" }}>
-              Designed & Built by{" "}
-              <a href="mailto:himharihiw@gmail.com"
-                style={{ color: t.text2, textDecoration: "none", transition: "all 0.2s" }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = t.terra; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = t.text2; }}
-              >
-                Himanshi Hiwarekar
-              </a>
-            </div>
           </div>
         </div>
       </div>
@@ -4375,6 +4378,76 @@ function Footer({ t }) {
         @keyframes footerShimmer {
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
+        }
+        @media (max-width: 768px) {
+          .site-footer-container {
+            padding: 30px 4% 0 !important;
+          }
+          .footer-newsletter-cta {
+            padding: 24px 20px !important;
+            margin-bottom: 30px !important;
+            border-radius: 16px !important;
+          }
+          .site-footer-bottom {
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+            gap: 12px !important;
+            padding: 16px 0 20px !important;
+          }
+          .site-footer-bottom > div {
+            text-align: center !important;
+            justify-content: center !important;
+          }
+          .footer-grid {
+            justify-items: center !important;
+            text-align: center !important;
+            gap: 28px !important;
+            padding-bottom: 24px !important;
+          }
+          .footer-grid > div {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .footer-grid h4 {
+            margin-bottom: 12px !important;
+            padding-bottom: 8px !important;
+          }
+          .footer-grid h4 span {
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+          }
+          .footer-grid p {
+            margin-bottom: 14px !important;
+          }
+          .footer-grid .social-links {
+            justify-content: center !important;
+          }
+          .footer-grid .google-review-stars {
+            justify-content: center !important;
+          }
+          .footer-grid .google-review-badge {
+            margin-top: 14px !important;
+          }
+          .footer-grid .contact-list {
+            gap: 8px !important;
+          }
+          .footer-grid .contact-item {
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+            gap: 8px !important;
+          }
+          .footer-grid .footer-link-item {
+            padding: 4px 0 !important;
+          }
+          .footer-grid .business-hours {
+            margin-top: 14px !important;
+            padding: 10px 12px !important;
+          }
         }
       `}</style>
     </footer>
