@@ -4357,7 +4357,14 @@ function Footer({ t }) {
               ))}
             </div>
             <div style={{ fontSize: 11, color: t.text2, opacity: 0.4, letterSpacing: "0.04em" }}>
-              Crafted with ♥ in India
+              Designed & Built by{" "}
+              <a href="mailto:himharihiw@gmail.com"
+                style={{ color: t.text2, textDecoration: "none", transition: "all 0.2s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = t.terra; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = t.text2; }}
+              >
+                Himanshi Hiwarekar
+              </a>
             </div>
           </div>
         </div>
