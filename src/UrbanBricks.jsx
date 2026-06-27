@@ -4269,7 +4269,7 @@ function BrandLogo({ brand, t }) {
   return (
     <div
       style={{
-        padding: "10px 20px",
+        padding: "10px 24px",
         background: t.isDark ? "rgba(26, 14, 10, 0.4)" : "rgba(255, 255, 255, 0.65)",
         border: `1px solid ${t.border}`,
         borderRadius: "12px",
@@ -4280,11 +4280,11 @@ function BrandLogo({ brand, t }) {
         justifyContent: "center",
         cursor: "default",
         transition: "all 0.3s",
-        height: "50px",
-        minWidth: "135px",
+        height: "75px",
+        minWidth: "180px",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-3px) scale(1.03)";
+        e.currentTarget.style.transform = "translateY(-4px) scale(1.05)";
         e.currentTarget.style.boxShadow = `0 8px 24px ${t.terra}22`;
         e.currentTarget.style.borderColor = `${t.terra}aa`;
       }}
@@ -4303,8 +4303,8 @@ function BrandLogo({ brand, t }) {
           }
         }}
         style={{
-          maxHeight: "30px",
-          maxWidth: "105px",
+          maxHeight: "50px",
+          maxWidth: "140px",
           objectFit: "contain",
         }}
       />
