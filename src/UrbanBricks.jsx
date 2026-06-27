@@ -165,6 +165,58 @@ function GlobalStyles({ t }) {
         animation-play-state: paused;
       }
       
+      /* Google Review Feedback Card responsive styling */
+      .feedback-card-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s, background 0.3s;
+      }
+      
+      .feedback-card-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+      }
+      
+      .feedback-card-text {
+        min-width: 0;
+      }
+      
+      .feedback-card-stars-row {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        margin-top: 4px;
+        flex-wrap: wrap;
+      }
+      
+      .feedback-card-btn {
+        flex-shrink: 0;
+      }
+
+      @media (max-width: 520px) {
+        .feedback-card-container {
+          flex-direction: column !important;
+          align-items: stretch !important;
+          gap: 16px !important;
+          padding: 20px 20px !important;
+          border-radius: 12px !important;
+        }
+        
+        .feedback-card-left {
+          align-items: flex-start !important;
+        }
+        
+        .feedback-card-btn {
+          width: 100% !important;
+          text-align: center !important;
+          align-self: stretch !important;
+        }
+      }
+      
       @media (max-width: 768px) {
         .ub-hide-mobile { display: none !important; }
         .ub-show-mobile { display: flex !important; }
@@ -3612,10 +3664,8 @@ Here are my details:
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.02, y: -4 }}
                 whileTap={{ scale: 0.98 }}
+                className="feedback-card-container"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
                   background: t.card,
                   borderTop: `1px solid ${t.border}`,
                   borderRight: `1px solid ${t.border}`,
@@ -3638,7 +3688,7 @@ Here are my details:
                   e.currentTarget.style.boxShadow = `0 4px 16px ${t.shadow}`;
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div className="feedback-card-left">
                   <div style={{
                     width: 44, height: 44, borderRadius: "50%",
                     background: `linear-gradient(135deg, ${t.gold}, ${t.gold}cc)`,
@@ -3649,9 +3699,9 @@ Here are my details:
                   }}>
                     ⭐
                   </div>
-                  <div>
+                  <div className="feedback-card-text">
                     <div style={{ color: t.text1, fontWeight: 600, fontSize: 16 }}>Share Your Feedback</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 2, marginTop: 4 }}>
+                    <div className="feedback-card-stars-row">
                       {[...Array(5)].map((_, idx) => (
                         <span key={idx} style={{ color: "#FFD700", fontSize: 14 }}>★</span>
                       ))}
@@ -3659,7 +3709,7 @@ Here are my details:
                     </div>
                   </div>
                 </div>
-                <div style={{
+                <div className="feedback-card-btn" style={{
                   padding: "8px 16px", borderRadius: 8,
                   background: `${t.gold}18`, color: t.gold,
                   fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase",
@@ -4268,8 +4318,8 @@ function Footer({ t }) {
                   Business Hours
                 </div>
                 <div style={{ fontSize: 12, color: t.text2, lineHeight: 1.7 }}>
-                  Mon – Sat: 9:00 AM – 7:00 PM<br />
-                  Sunday: By Appointment
+                  Sun – Sat: 10:00 AM – 7:00 PM<br />
+                  Tuesday: Closed
                 </div>
               </div>
             </motion.div>
