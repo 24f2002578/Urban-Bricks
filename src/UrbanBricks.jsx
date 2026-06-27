@@ -3603,6 +3603,72 @@ Here are my details:
               />
             ))}
 
+            {/* Google Review Feedback Card */}
+            <FadeUp delay={0.54}>
+              <motion.a
+                href="https://g.page/r/CRfSva_cgLoFEAE/review"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.02, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  background: t.card,
+                  borderTop: `1px solid ${t.border}`,
+                  borderRight: `1px solid ${t.border}`,
+                  borderBottom: `1px solid ${t.border}`,
+                  borderLeft: `3px solid ${t.gold}`,
+                  padding: "20px 24px",
+                  borderRadius: "0 12px 12px 0",
+                  marginTop: 28,
+                  marginBottom: 28,
+                  boxShadow: `0 4px 16px ${t.shadow}`,
+                  textDecoration: "none",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = `${t.gold}66`;
+                  e.currentTarget.style.boxShadow = `0 8px 24px ${t.gold}22`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = t.border;
+                  e.currentTarget.style.boxShadow = `0 4px 16px ${t.shadow}`;
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: "50%",
+                    background: `linear-gradient(135deg, ${t.gold}, ${t.gold}cc)`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    boxShadow: `0 4px 14px ${t.gold}44`,
+                    flexShrink: 0,
+                    fontSize: 20,
+                  }}>
+                    ⭐
+                  </div>
+                  <div>
+                    <div style={{ color: t.text1, fontWeight: 600, fontSize: 16 }}>Share Your Feedback</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 2, marginTop: 4 }}>
+                      {[...Array(5)].map((_, idx) => (
+                        <span key={idx} style={{ color: "#FFD700", fontSize: 14 }}>★</span>
+                      ))}
+                      <span style={{ color: t.text2, fontSize: 12, marginLeft: 8, fontWeight: 500 }}>Write a Google Review</span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  padding: "8px 16px", borderRadius: 8,
+                  background: `${t.gold}18`, color: t.gold,
+                  fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase",
+                  border: `1px solid ${t.gold}33`, transition: "all 0.3s"
+                }}>
+                  Rate Us
+                </div>
+              </motion.a>
+            </FadeUp>
+
             {/* Office Location — Google Maps Card */}
             <FadeUp delay={0.62}>
               <motion.a
@@ -4049,6 +4115,29 @@ function Footer({ t }) {
                     {s.icon}
                   </motion.a>
                 ))}
+              </div>
+
+              {/* Google Review Badge */}
+              <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  {[...Array(5)].map((_, idx) => (
+                    <span key={idx} style={{ color: "#FFD700", fontSize: 15 }}>★</span>
+                  ))}
+                  <span style={{ color: t.text1, fontSize: 12, fontWeight: 600, marginLeft: 6 }}>5.0 Rating</span>
+                </div>
+                <a
+                  href="https://g.page/r/CRfSva_cgLoFEAE/review"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: t.gold, fontSize: 12, textDecoration: "none", fontWeight: 600,
+                    display: "inline-flex", alignItems: "center", gap: 4, transition: "color 0.2s"
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = t.terra)}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = t.gold)}
+                >
+                  Write a Google Review <ArrowUpRight size={14} />
+                </a>
               </div>
             </motion.div>
 
