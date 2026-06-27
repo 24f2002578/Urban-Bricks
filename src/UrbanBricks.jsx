@@ -1019,22 +1019,23 @@ function Preloader({ onComplete, t }) {
           <motion.div
             initial={{ y: "110%" }} animate={{ y: 0 }}
             transition={{ delay: 2.8, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "clamp(8px, 2.5vw, 14px)" }}
           >
             <div style={{
-              width: 52, height: 52, borderRadius: "50%",
+              width: "clamp(38px, 9vw, 52px)", height: "clamp(38px, 9vw, 52px)", borderRadius: "50%",
               background: "linear-gradient(145deg, #8B4513, #4A2200)",
               display: "flex", alignItems: "center", justifyContent: "center",
               boxShadow: "0 0 28px rgba(140,70,20,0.55), inset 0 1px 0 rgba(255,255,255,0.12)",
               border: "2.5px solid rgba(201,151,74,0.5)", flexShrink: 0,
             }}>
-              <span style={{ color: "#FFF", fontWeight: 800, fontSize: 19, fontFamily: "Georgia, serif" }}>UB</span>
+              <span style={{ color: "#FFF", fontWeight: 800, fontSize: "clamp(14px, 3.5vw, 19px)", fontFamily: "Georgia, serif" }}>UB</span>
             </div>
             <span style={{
               fontFamily: "Georgia, 'Times New Roman', serif",
-              fontSize: 40, fontWeight: 700,
+              fontSize: "clamp(24px, 6.5vw, 40px)", fontWeight: 700,
               color: t.isDark ? "#F2E5CC" : "#1A0E07",
               letterSpacing: "0.1em", textTransform: "uppercase",
+              whiteSpace: "nowrap",
               textShadow: t.isDark ? "0 2px 24px rgba(0,0,0,0.7)" : "0 2px 12px rgba(255,255,255,0.6)",
             }}>Urban Bricks</span>
           </motion.div>
@@ -1044,7 +1045,7 @@ function Preloader({ onComplete, t }) {
           initial={{ opacity: 0, letterSpacing: "0.1em" }}
           animate={{ opacity: 1, letterSpacing: "0.30em" }}
           transition={{ delay: 3.3, duration: 0.8 }}
-          style={{ color: t.gold, fontSize: 10, textTransform: "uppercase", marginTop: 12, fontWeight: 500 }}
+          style={{ color: t.gold, fontSize: "clamp(8px, 2vw, 10px)", textTransform: "uppercase", marginTop: 12, fontWeight: 500, whiteSpace: "nowrap" }}
         >Real Estate Complete Solution</motion.p>
       </div>
 
