@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import founderImg from "./assets/chandan.jpg";
+import logoImg from "./assets/logo_new.png";
 import {
   Home, Building2, Tractor, MapPin, Trees, Store, Factory,
   LayoutTemplate, Layers, Palette, Sofa, Phone, Mail,
@@ -262,40 +263,21 @@ function GlobalStyles({ t }) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  UB LOGO (faithful recreation of circular badge)
+//  UB LOGO (uses actual PNG brand logo)
 // ══════════════════════════════════════════════════════════════
-function UBLogo({ size = 38, t, showTagline = true }) {
+function UBLogo({ size = 38, t }) {
   return (
-    <a href="#home" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <div style={{
-        width: size, height: size, borderRadius: "50%",
-        background: "linear-gradient(145deg, #8B4513, #4A2200)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        flexShrink: 0,
-        boxShadow: `0 2px 14px rgba(92,46,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12)`,
-        border: "2px solid rgba(201,151,74,0.45)",
-      }}>
-        <span style={{
-          color: "#FFF", fontWeight: 800, fontSize: size * 0.35,
-          fontFamily: "Georgia, 'Times New Roman', serif",
-          letterSpacing: "-0.5px", lineHeight: 1, userSelect: "none",
-        }}>UB</span>
-      </div>
-      <div>
-        <div style={{
-          fontFamily: "Georgia, 'Times New Roman', serif",
-          fontWeight: 700, fontSize: size * 0.52,
-          color: t.text1, letterSpacing: "0.04em", lineHeight: 1,
-          transition: "color 0.3s",
-        }}>Urban Bricks</div>
-        {showTagline && (
-          <div style={{
-            fontSize: size * 0.20, color: t.gold,
-            letterSpacing: "0.26em", textTransform: "uppercase",
-            marginTop: 2, fontWeight: 500,
-          }}>Real Estate</div>
-        )}
-      </div>
+    <a href="#home" style={{ display: "flex", alignItems: "center" }}>
+      <img
+        src={logoImg}
+        alt="Urban Bricks"
+        style={{
+          height: 52,
+          width: "auto",
+          display: "block",
+          objectFit: "contain",
+        }}
+      />
     </a>
   );
 }
