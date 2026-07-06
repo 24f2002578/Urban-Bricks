@@ -272,7 +272,7 @@ function UBLogo({ size = 38, t }) {
         src={logoImg}
         alt="Urban Bricks"
         style={{
-          height: 70,
+          height: 52,
           width: "auto",
           display: "block",
           objectFit: "contain",
