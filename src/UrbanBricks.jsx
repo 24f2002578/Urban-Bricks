@@ -1,7 +1,7 @@
 // src/UrbanBricks.jsx  –  Full redesign: 3D building, day/night sky, light/dark theme, 3D tilt cards
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import founderImg from "./assets/chandan.jpg";
+import founderImg from "./assets/chandan.jpeg";
 import logoImg from "./assets/logo_new.png";
 import {
   Home, Building2, Tractor, MapPin, Trees, Store, Factory,
